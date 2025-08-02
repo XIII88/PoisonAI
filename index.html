@@ -908,7 +908,8 @@
                 <div class="settings-option-group">
                     <label id="model-label">Выберите модель:</label>
                     <div class="settings-option-buttons">
-                        <button id="model-2-5-flash-preview-btn" data-model-id="gemini-2.5-flash-preview-04-17">2.5 flash</button>
+                        <!-- Updated data-model-id for 2.5-flash-preview-5.20 -->
+                        <button id="model-2-5-flash-preview-btn" data-model-id="gemini-2.5-flash-preview-05-20">2.5 flash</button>
                         <button id="model-2-0-flash-btn" data-model-id="gemini-2.0-flash">2.0 flash</button>
                         <button id="model-gemma-3-27b-it-btn" data-model-id="gemma-3-27b-it">Gemma 3 27B</button> </div>
                 </div>
@@ -930,7 +931,7 @@
 
     <script>
         // Global variables for the API key (remains empty, Canvas will provide it)
-        const geminiApiKey = "AIzaSyCNUwQzg6cyfZJdiCvF5m34tcdjaO9XNWo";
+        const geminiApiKey = "AIzaSyCNUwQzg6cyfZJdiCvF5m34tcdjaO9XNWo"; // API key for Gemini (chat)
         const stabilityApiKey = "sk-jvi1Fy9CqZeH7lp7qWy2o1uvuXYXs75mtAllTkXM0TmAo30F";
 
         // Get references to DOM elements
@@ -1040,7 +1041,8 @@
         // Theme, Language, and Model state
         let currentTheme = localStorage.getItem('theme') || 'system'; // 'light', 'dark', 'system'
         let currentLanguage = localStorage.getItem('language') || 'ru'; // 'ru', 'en'
-        let currentModel = localStorage.getItem('model') || 'gemini-2.5-flash-preview-04-17'; // Default model
+        // Updated default model to 'gemini-2.5-flash-preview-05-20'
+        let currentModel = localStorage.getItem('model') || 'gemini-2.5-flash-preview-05-20'; // Default model
 
         // Language data for localization
         const languageData = {
@@ -1221,7 +1223,8 @@
             [model25FlashPreviewBtn, model20FlashBtn, modelGemma327BItBtn].forEach(btn => { // Updated button list
                 btn.classList.remove('active');
             });
-            if (currentModel === 'gemini-2.5-flash-preview-04-17') model25FlashPreviewBtn.classList.add('active');
+            // Updated condition for 2.5 flash preview to 05-20
+            if (currentModel === 'gemini-2.5-flash-preview-05-20') model25FlashPreviewBtn.classList.add('active');
             else if (currentModel === 'gemini-2.0-flash') model20FlashBtn.classList.add('active');
             else if (currentModel === 'gemma-3-27b-it') modelGemma327BItBtn.classList.add('active'); // Updated condition for Gemma
         }
@@ -1922,7 +1925,8 @@
         langEnBtn.addEventListener('click', () => applyLanguage('en'));
 
         // Event listeners for model selection buttons
-        model25FlashPreviewBtn.addEventListener('click', () => setChatModel('gemini-2.5-flash-preview-04-17'));
+        // Updated model ID for gemini-2.5-flash-preview-btn
+        model25FlashPreviewBtn.addEventListener('click', () => setChatModel('gemini-2.5-flash-preview-05-20'));
         model20FlashBtn.addEventListener('click', () => setChatModel('gemini-2.0-flash'));
         modelGemma327BItBtn.addEventListener('click', () => setChatModel('gemma-3-27b-it')); // Updated event listener for Gemma
 
