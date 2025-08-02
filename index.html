@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poison AI</title>
+    <link rel="icon" href="poison.ico" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for theming */
+        body {
+            /* Light theme defaults */
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #6b7280;
+            --border-color: #e2e8f0;
+            --chat-history-bg: #f8fafc;
+            --chat-user-bg: #e0e7ff;
+            --chat-ai-bg: #dcfce7;
+            --code-bg: #e2e8f0;
+            --code-text: #4a5568;
+            --copy-btn-bg: rgba(0, 0, 0, 0.7);
+            --copy-btn-hover-bg: rgba(0, 0, 0, 0.9);
+            --modal-bg: rgba(0, 0, 0, 0.5); /* Overlay background */
+            --modal-content-bg: #ffffff;
+            --modal-content-text: #333;
+            --settings-tab-inactive-bg: #f8fafc;
+            --prefix-ai-color: #10b981; /* Green for light theme */
+            --prefix-user-color: #4f46e5; /* Purple/Indigo for light theme */
+            --loading-text-color: #6b7280; /* Default for light theme */
+        }
+
+        body.dark-theme {
+            /* Dark theme overrides */
+            --bg-primary: #1a202c; /* Dark background */
+            --bg-secondary: #2d3748; /* Darker content background */
+            --text-primary: #e2e8f0; /* Light text */
+            --text-secondary: #a0aec0; /* Lighter gray text */
+            --border-color: #4a5568;
+            --chat-history-bg: #2d3748;
+            --chat-user-bg: #4c51bf; /* Darker blue for user */
+            --chat-ai-bg: #38a169; /* Darker green for AI */
+            --code-bg: #4a5568;
+            --code-text: #e2e8f0;
+            --copy-btn-bg: rgba(255, 255, 255, 0.2);
+            --copy-btn-hover-bg: rgba(255, 255, 255, 0.4);
+            --modal-bg: rgba(0, 0, 0, 0.7);
+            --modal-content-bg: #1a202c;
+            --modal-content-text: #e2e8f0;
+            --settings-tab-inactive-bg: #2d3748;
+            --prefix-ai-color: #e2e8f0; /* Very light gray for dark theme */
+            --prefix-user-color: #e2e8f0; /* Very light gray for dark theme */
+            --loading-text-color: #ffffff; /* White for dark theme */
+        }
+
+        /* Apply variables */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            cursor: default;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+        }
+
+        .app-container {
+            background-color: var(--bg-secondary);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out, background-color 0.3s ease, box-shadow 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        body.loaded .app-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .app-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            position: relative; /* For settings button positioning */
+        }
+        .app-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .app-header p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Settings button in header */
+        #settings-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            padding: 0.5rem; /* Make it easier to click */
+            border-radius: 0.5rem; /* Slightly rounded */
+        }
+        #settings-btn:hover {
+            color: var(--text-primary);
+            transform: rotate(30deg); /* Small rotation on hover */
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--chat-history-bg);
+        }
+        .nav-tabs button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            margin: 0 0.5rem;
+        }
+        .nav-tabs button.active {
+            background: linear-gradient(to right, #8b5cf6, #6366f1);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .nav-tabs button:hover:not(.active) {
+            background-color: var(--border-color);
+        }
+
+        .tab-content {
+            flex: 1;
+            padding: 1.5rem 1.5rem 3.5rem 1.5rem;
+            display: none;
+            flex-direction: column;
+            transition: opacity 0.3s ease-out;
+            position: relative;
+        }
+        .tab-content.active {
+            display: flex;
+            opacity: 1;
+        }
+        .tab-content:not(.active) {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        #chat-history {
+            flex: none;
+            height: 400px;
+            overflow-y: auto;
+            background-color: var(--chat-history-bg);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            padding-top: 2.5rem;
+            margin-bottom: 1rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            position: relative;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chat-message {
+            max-width: 85%; /* Default for user, overridden for AI */
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            line-height: 1.4;
+        }
+        .chat-message.user {
+            background-color: var(--chat-user-bg);
+            align-self: flex-end;
+            text-align: left;
+            color: var(--text-primary);
+            max-width: 90%; /* Changed to 90% as requested */
+        }
+        .chat-message.ai {
+            background-color: var(--chat-ai-bg);
+            align-self: flex-start;
+            text-align: left;
+            color: var(--text-primary);
+            max-width: 95%; /* AI messages remain 95% */
+        }
+        .chat-message .prefix {
+            font-weight: 600;
+            margin-right: 0.25rem;
+            color: var(--prefix-ai-color); /* Use CSS variable for AI prefix */
+            transition: color 0.3s ease;
+        }
+        .chat-message.user .prefix {
+            color: var(--prefix-user-color); /* Use CSS variable for user prefix */
+            transition: color 0.3s ease;
+        }
+
+        #clear-chat-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 9999px;
+            background-color: #dc2626;
+            color: white; /* This color is for the SVG fill */
+            border: 1px solid #b91c1c;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease-in-out;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+            display: flex; /* For centering SVG */
+            align-items: center;
+            justify-content: center;
+        }
+        #clear-chat-btn:hover {
+            background-color: #ef4444;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+        }
+        #clear-chat-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+
+        .chat-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .chat-input-row {
+            display: flex;
+            width: 100%;
+            gap: 0.5rem;
+            align-items: flex-end;
+        }
+        #chat-input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            resize: none;
+            overflow-y: hidden;
+            transition: height 0.2s ease-out, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            min-height: 3rem;
+            max-height: 6rem;
+        }
+        #chat-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        #small-send-btn {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            background: linear-gradient(to right, #8b5cf6, #6366f1);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease-in-out;
+        }
+        #small-send-btn:hover:not(:disabled) {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            transform: translateY(-1px);
+        }
+
+        #small-send-btn:active {
+            transform: translateY(0);
+        }
+        #small-send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #cbd5e0;
+            box-shadow: none;
+        }
+
+        #file-upload-preview {
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            background-color: var(--code-bg); /* Use code bg for preview */
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            max-width: 100%;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-out, background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #file-preview-image {
+            max-width: 80px;
+            max-height: 80px;
+            border-radius: 0.5rem;
+            object-fit: cover;
+            border: 1px solid var(--text-secondary);
+        }
+        #file-preview-icon {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            border: 1px solid var(--text-secondary);
+            background-color: var(--chat-history-bg);
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+        }
+        #file-preview-filename {
+            flex-grow: 1;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s ease;
+        }
+        #remove-file-btn {
+            background-color: #ef4444;
+            color: white;
+            border-radius: 9999px;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+        #remove-file-btn:hover {
+            background-color: #dc2626;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #cbd5e0;
+            box-shadow: none;
+        }
+
+        .bottom-buttons {
+            display: flex;
+            gap: 0.75rem;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+        .bottom-buttons .action-button {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 75px;
+            padding: 0.5rem 0.5rem;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+        .bottom-buttons .action-button svg {
+            margin-top: 0.25rem;
+            height: 2.5rem;
+            width: 2.5rem;
+            color: white;
+        }
+
+        #choose-photo-btn { background: linear-gradient(to right, #22c55e, #10b981); }
+        #choose-photo-btn:hover:not(:disabled) { background: linear-gradient(to right, #10b981, #22c55e); transform: translateY(-1px); }
+        #take-photo-btn { background: linear-gradient(to right, #3b82f6, #2563eb); }
+        #take-photo-btn:hover:not(:disabled) { background: linear-gradient(to right, #2563eb, #3b82f6); transform: translateY(-1px); }
+        #upload-file-btn { background: linear-gradient(to right, #f59e0b, #eab308); }
+        #upload-file-btn:hover:not(:disabled) { background: linear-gradient(to right, #eab308, #f59e0b); transform: translateY(-1px); }
+
+        #download-image-btn { background: linear-gradient(to right, #22c55e, #10b981); }
+        #download-image-btn:hover:not(:disabled) { background: linear-gradient(to right, #10b981, #22c55e); transform: translateY(-1px); }
+
+        .image-input-area {
+            margin-bottom: 1rem;
+            position: relative; /* Added for clear button positioning */
+        }
+        .image-input-area label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            transition: color 0.3s ease;
+        }
+        /* Specific style for the image generation model label in dark theme */
+        body.dark-theme label[for="stabilityEngineSelect"] {
+            color: #FFFFFF !important; /* Force white in dark theme */
+        }
+        #image-prompt-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            resize: vertical;
+            min-height: 4rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            padding-right: 2.5rem; /* Make space for the clear button */
+        }
+        #image-prompt-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Clear button for image prompt input */
+        #clear-image-prompt-btn {
+            position: absolute;
+            right: 0.75rem;
+            /* Calculate top based on label height (approx 1.5rem) + label margin-bottom (0.5rem) + input padding-top (0.75rem) */
+            /* Aim for vertical center of the input field */
+            top: calc(1.5rem + 0.5rem + 0.75rem); /* Adjust this value as needed for perfect alignment */
+            transform: translateY(-50%); /* Vertically center the button itself */
+            background: none;
+            border: none;
+            color: var(--text-secondary); /* Use text-secondary for better visibility in light theme */
+            font-size: 1.5rem; /* Increased size */
+            cursor: pointer;
+            display: none; /* Hidden by default, shown when text is present */
+            transition: color 0.2s ease-in-out;
+            padding: 0.2rem;
+        }
+        #clear-image-prompt-btn:hover {
+            color: var(--text-primary); /* Darker on hover */
+        }
+        body.dark-theme #clear-image-prompt-btn {
+            color: #a0aec0; /* Lighter gray for dark theme */
+        }
+        body.dark-theme #clear-image-prompt-btn:hover {
+            color: #e2e8f0; /* White on hover in dark theme */
+        }
+
+
+        .image-display-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--chat-history-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-top: 1rem;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .image-display-container p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        #generated-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            object-fit: contain;
+            /* Reverted max-height to original state (no specific max-height) */
+            transition: border-color 0.3s ease;
+        }
+
+        .global-message-banner {
+            opacity: 0;
+            height: auto;
+            overflow: hidden;
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+            text-align: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 500;
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            width: calc(100% - 2rem);
+            max-width: 480px;
+            z-index: 1000;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .global-message-banner.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .global-message-banner.error { background-color: #fee2e2; color: #dc2626; }
+        .global-message-banner.success { background-color: #dcfce7; color: #16a34a; }
+
+        .loading-spinner {
+            border-top-color: #6366f1;
+            border-right-color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+
+        /* Styling for loading text to be white in dark theme and centered */
+        #chat-loading, #image-loading {
+            display: flex; /* Use flexbox for centering */
+            align-items: center; /* Vertically center with spinner */
+            justify-content: center; /* Horizontally center spinner and text */
+            gap: 0.5rem; /* Space between spinner and text */
+            margin-top: 1rem; /* Adjust margin as needed */
+        }
+
+        #chat-loading-text, #generating-text {
+            color: var(--loading-text-color); /* Use CSS variable for color */
+            font-weight: 500;
+        }
+
+        /* Ensure hidden class always sets display to none */
+        .hidden {
+            display: none !important;
+        }
+
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--text-secondary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #718096; }
+
+        .chat-message .code-block {
+            background-color: var(--code-bg);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            white-space: pre; /* Preserve whitespace and prevent wrapping */
+            word-break: normal; /* Do not break words */
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--code-text); /* Default text color for code block */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            border: 1px solid var(--border-color);
+            position: relative;
+            padding-top: 1.5rem;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .copy-code-btn {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            background-color: var(--copy-btn-bg);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            z-index: 1;
+        }
+        .copy-code-btn:hover {
+            background-color: var(--copy-btn-hover-bg);
+        }
+
+        #generate-image-btn { background: linear-gradient(to right, #8b5cf6, #6366f1); }
+        #generate-image-btn:hover:not(:disabled) { background: linear-gradient(to right, #6366f1, #8b5cf6); transform: translateY(-1px); }
+
+        /* Settings Modal Styles */
+        .settings-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .settings-modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .settings-modal-content {
+            background-color: var(--modal-content-bg);
+            color: var(--modal-content-text);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh; /* Limit modal height */
+        }
+        .settings-modal-overlay.show .settings-modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .settings-modal-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .settings-modal-close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .settings-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .settings-tabs button {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            background-color: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+        .settings-tabs button.active {
+            color: #6366f1;
+            border-bottom-color: #6366f1;
+        }
+        .settings-tabs button:hover:not(.active) {
+            background-color: var(--settings-tab-inactive-bg);
+        }
+
+        .settings-tab-content {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto; /* Allow scrolling for content if needed */
+            padding-top: 0.5rem; /* Small padding after tabs */
+        }
+        .settings-tab-content.active {
+            display: flex;
+        }
+
+        .settings-option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .settings-option-group label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+        .settings-option-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .settings-option-buttons button {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .settings-option-buttons button.active {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+        }
+        .settings-option-buttons button:hover:not(.active) {
+            background-color: var(--border-color);
+        }
+
+        .developers-info p {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+        .developers-info strong {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="global-error-banner" class="global-message-banner"></div>
+    <div id="global-success-banner" class="global-message-banner"></div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1>
+                <span class="text-emerald-500">Poison </span>
+                <span class="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-yellow-400">AI</span>
+            </h1>
+            <p id="header-subtitle">Введите текст для общения с искусственным интеллектом или опишите изображение для генерации.</p>
+            <button id="settings-btn" type="button" title="Настройки">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+        </header>
+
+        <nav class="nav-tabs">
+            <button id="chat-tab" type="button" class="active">Чат с Poison AI</button>
+            <button id="image-tab" type="button">Генерация изображений</button>
+        </nav>
+
+        <div id="chat-view" class="tab-content active">
+            <button id="clear-chat-btn" type="button" title="Очистить чат">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="white">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 11-2 0v6a1 1 0 112 0V8z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <div id="chat-history">
+                <div class="chat-message ai">
+                    <span class="prefix" id="ai-prefix">Poison AI:</span> <span id="ai-greeting">Привет, я Poison AI, разработка Poison Team. Чем могу помочь?</span>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div id="file-upload-preview" class="hidden">
+                    <img id="file-preview-image" src="" alt="Предварительный просмотр изображения">
+                    <div id="file-preview-icon" class="hidden">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <span id="file-preview-filename"></span>
+                    <button id="remove-file-btn" type="button">X</button>
+                </div>
+                <div class="chat-input-row">
+                    <textarea id="chat-input" placeholder="Введите ваше сообщение..."></textarea>
+                    <button id="small-send-btn" type="button" title="Отправить сообщение">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="bottom-buttons">
+                    <button id="choose-photo-btn" type="button" class="action-button">
+                        <span id="gallery-btn-text">Галерея</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-2-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                    <button id="take-photo-btn" type="button" class="action-button">
+                        <span id="camera-btn-text">Камера</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </button>
+                    <button id="upload-file-btn" type="button" class="action-button">
+                        <span id="file-btn-text">Файл</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                    </button>
+                </div>
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <input type="file" id="camera-input" accept="image/*" capture="camera" class="hidden">
+                <input type="file" id="general-file-input" class="hidden">
+            </div>
+            <div id="chat-loading" class="hidden text-center mt-4 text-gray-600">
+                <div class="animate-spin inline-block w-6 h-6 border-4 border-t-4 loading-spinner rounded-full"></div>
+                <span class="ml-2 text-base" id="chat-loading-text">Загрузка...</span>
+            </div>
+        </div>
+
+        <div id="image-view" class="tab-content">
+            <div class="image-input-area">
+                <label for="image-prompt-input" id="image-prompt-label">Описание изображения:</label>
+                <textarea id="image-prompt-input" placeholder="Введите описание..."></textarea>
+                <button id="clear-image-prompt-btn" type="button" title="Очистить поле">
+                    &times;
+                </button>
+            </div>
+            <div class="mb-6">
+                <label for="stabilityEngineSelect" id="stability-engine-label" class="block text-gray-700 text-sm font-medium mb-2">Выберите модель (движок):</label>
+                <select
+                    id="stabilityEngineSelect"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 bg-white dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
+                >
+                    <option value="stable-diffusion-xl-1024-v1-0">Stable Diffusion XL (1024x1024)</option>
+                    <option value="stable-diffusion-v1-6">Stable Diffusion v1.6 (512x512)</option>
+                    </select>
+            </div>
+            <button id="generate-image-btn" type="button" class="action-button w-full mb-4">Сгенерировать изображение</button>
+
+            <div class="image-display-container">
+                <p id="generated-image-text">Ваше сгенерированное изображение:</p>
+                <img id="generated-image" src="https://placehold.co/400x300/e2e8f0/6b7280?text=Ваше+изображение+появится+здесь" alt="Сгенерированное изображение">
+                <button id="download-image-btn" type="button" class="action-button mt-4 hidden">Скачать изображение</button>
+            </div>
+            <div id="image-loading" class="hidden text-center mt-4 text-gray-600">
+                <div class="animate-spin inline-block w-6 h-6 border-4 border-t-4 loading-spinner rounded-full"></div>
+                <span class="ml-2 text-base" id="generating-text">Генерация...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal-overlay" class="settings-modal-overlay">
+        <div class="settings-modal-content">
+            <button id="settings-modal-close-btn" class="settings-modal-close-btn">&times;</button>
+            <h2 class="text-2xl font-bold mb-4" id="settings-title">Настройки</h2>
+
+            <div class="settings-tabs">
+                <button id="theme-settings-tab" class="active">Тема</button>
+                <button id="language-settings-tab">Язык</button>
+                <button id="model-settings-tab">Модель</button> <button id="developers-settings-tab">Разработчики</button>
+            </div>
+
+            <div id="theme-settings-content" class="settings-tab-content active">
+                <div class="settings-option-group">
+                    <label id="theme-label">Выберите тему:</label>
+                    <div class="settings-option-buttons">
+                        <button id="theme-light-btn">Светлая</button>
+                        <button id="theme-dark-btn">Темная</button>
+                        <button id="theme-system-btn">Как в системе</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="language-settings-content" class="settings-tab-content">
+                <div class="settings-option-group">
+                    <label id="language-label">Выберите язык:</label>
+                    <div class="settings-option-buttons">
+                        <button id="lang-ru-btn">Русский</button>
+                        <button id="lang-en-btn">Английский</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="model-settings-content" class="settings-tab-content">
+                <div class="settings-option-group">
+                    <label id="model-label">Выберите модель:</label>
+                    <div class="settings-option-buttons">
+                        <button id="model-2-5-flash-preview-btn" data-model-id="gemini-2.5-flash-preview-04-17">2.5 flash</button>
+                        <button id="model-2-0-flash-btn" data-model-id="gemini-2.0-flash">2.0 flash</button>
+                        <button id="model-gemma-3-27b-it-btn" data-model-id="gemma-3-27b-it">Gemma 3 27B</button> </div>
+                </div>
+            </div>
+
+            <div id="developers-settings-content" class="settings-tab-content">
+                <div class="developers-info">
+                    <p id="devs-team-members-label">Участники команды Poison Team:</p>
+                    <p><strong>Fedorin</strong></p>
+                    <p><strong>qwwking</strong></p>
+                    <p><strong>Defender</strong></p>
+                    <p><strong>Korin</strong></p>
+                    <p id="devs-contact-info-paragraph">Подробности можно узнать у <a id="devs-contact-link" href="https://t.me/By_PoisonAI" target="_blank" class="text-blue-500 hover:underline">@By_PoisonAI</a></p>
+                    <p id="devs-supporters">Поддерживали: otchim_ksb</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables for the API key (remains empty, Canvas will provide it)
+        const geminiApiKey = "AIzaSyCNUwQzg6cyfZJdiCvF5m34tcdjaO9XNWo";
+        const stabilityApiKey = "sk-jvi1Fy9CqZeH7lp7qWy2o1uvuXYXs75mtAllTkXM0TmAo30F";
+
+        // Get references to DOM elements
+        const appContainer = document.querySelector('.app-container');
+        const chatTab = document.getElementById('chat-tab');
+        const imageTab = document.getElementById('image-tab');
+        const chatView = document.getElementById('chat-view');
+        const imageView = document.getElementById('image-view');
+
+        const chatHistoryDiv = document.getElementById('chat-history');
+        const chatInput = document.getElementById('chat-input');
+        const smallSendBtn = document.getElementById('small-send-btn');
+        const chatLoading = document.getElementById('chat-loading');
+        const chatLoadingText = document.getElementById('chat-loading-text');
+        const clearChatBtn = document.getElementById('clear-chat-btn');
+
+        // Elements for image/file upload in chat
+        const choosePhotoBtn = document.getElementById('choose-photo-btn');
+        const takePhotoBtn = document.getElementById('take-photo-btn');
+        const uploadFileBtn = document.getElementById('upload-file-btn');
+        const fileInput = document.getElementById('file-input');
+        const cameraInput = document.getElementById('camera-input');
+        const generalFileInput = document.getElementById('general-file-input');
+
+        const fileUploadPreview = document.getElementById('file-upload-preview');
+        const filePreviewImage = document.getElementById('file-preview-image');
+        const filePreviewIcon = document.getElementById('file-preview-icon');
+        const filePreviewFilename = document.getElementById('file-preview-filename');
+        const removeFileBtn = document.getElementById('remove-file-btn');
+
+        // Global message banners
+        const globalErrorBanner = document.getElementById('global-error-banner');
+        const globalSuccessBanner = document.getElementById('global-success-banner');
+
+        // Image generation elements
+        const imagePromptInput = document.getElementById('image-prompt-input');
+        const clearImagePromptBtn = document.getElementById('clear-image-prompt-btn'); // New: Clear button for image prompt
+        const stabilityEngineSelect = document.getElementById('stabilityEngineSelect'); // New select for Stability AI engines
+        const stabilityEngineLabel = document.getElementById('stability-engine-label'); // New label for Stability AI engine select
+        const generateImageBtn = document.getElementById('generate-image-btn');
+        const generatedImage = document.getElementById('generated-image');
+        const downloadImageBtn = document.getElementById('download-image-btn');
+        const imageLoading = document.getElementById('image-loading');
+
+        // Settings Modal elements
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsModalOverlay = document.getElementById('settings-modal-overlay');
+        const settingsModalCloseBtn = document.getElementById('settings-modal-close-btn');
+        const themeSettingsTab = document.getElementById('theme-settings-tab');
+        const languageSettingsTab = document.getElementById('language-settings-tab');
+        const modelSettingsTab = document.getElementById('model-settings-tab'); // New reference for model tab
+        const developersSettingsTab = document.getElementById('developers-settings-tab');
+        const themeSettingsContent = document.getElementById('theme-settings-content');
+        const languageSettingsContent = document.getElementById('language-settings-content');
+        const modelSettingsContent = document.getElementById('model-settings-content'); // New reference for model content
+        const developersSettingsContent = document.getElementById('developers-settings-content');
+        const themeLightBtn = document.getElementById('theme-light-btn');
+        const themeDarkBtn = document.getElementById('theme-dark-btn');
+        const themeSystemBtn = document.getElementById('theme-system-btn');
+        const langRuBtn = document.getElementById('lang-ru-btn');
+        const langEnBtn = document.getElementById('lang-en-btn');
+
+        // New model selection buttons
+        const model25FlashPreviewBtn = document.getElementById('model-2-5-flash-preview-btn');
+        const model20FlashBtn = document.getElementById('model-2-0-flash-btn');
+        const modelGemma327BItBtn = document.getElementById('model-gemma-3-27b-it-btn'); // Updated reference for Gemma model button
+
+        // Localized elements
+        const headerSubtitle = document.getElementById('header-subtitle');
+        const aiPrefixSpan = document.getElementById('ai-prefix'); // New: for AI prefix
+        const aiGreeting = document.getElementById('ai-greeting');
+        const chatInputPlaceholder = chatInput; // Direct reference to textarea
+        const sendBtnTitle = smallSendBtn; // Direct reference to button for title attribute
+        const galleryBtnText = document.getElementById('gallery-btn-text');
+        const cameraBtnText = document.getElementById('camera-btn-text');
+        const fileBtnText = document.getElementById('file-btn-text');
+        const imagePromptLabel = document.getElementById('image-prompt-label');
+        // imagePromptInputPlaceholder points to the actual input element to set its placeholder
+        const imagePromptInputPlaceholder = imagePromptInput;
+        const generatedImageText = document.getElementById('generated-image-text');
+        const settingsTitle = document.getElementById('settings-title');
+        const themeLabel = document.getElementById('theme-label');
+        const languageLabel = document.getElementById('language-label');
+        const modelLabel = document.getElementById('model-label'); // New reference for model label
+        const developersHeader = document.getElementById('developers-header');
+        const generatingText = document.getElementById('generating-text');
+        const devsTeamMembersLabel = document.getElementById('devs-team-members-label'); // New: for developers info
+        const devsContactInfoParagraph = document.getElementById('devs-contact-info-paragraph'); // New: for developers contact info paragraph
+        const devsContactLink = document.getElementById('devs-contact-link'); // New: for developers contact link
+        const devsSupporters = document.getElementById('devs-supporters'); // New: for supporters info
+
+
+        // Variables to store attached file data
+        let attachedImageData = null;
+        let attachedImageMimeType = null;
+        let attachedFileData = null;
+        let attachedFileMimeType = null;
+        let attachedFileName = null;
+
+        // Chat history to maintain context
+        let chatHistory = [{ role: "model", parts: [{ text: "Привет, я Poison AI, разработка Poison Team. Чем могу помочь?" }] }];
+
+        // Initial height for chat input textarea
+        const initialChatInputHeight = 48; // Corresponds to 3rem (1rem = 16px, so 3*16 = 48px)
+        const expandedChatInputHeight = initialChatInputHeight * 2; // 96px
+
+        // Theme, Language, and Model state
+        let currentTheme = localStorage.getItem('theme') || 'system'; // 'light', 'dark', 'system'
+        let currentLanguage = localStorage.getItem('language') || 'ru'; // 'ru', 'en'
+        let currentModel = localStorage.getItem('model') || 'gemini-2.5-flash-preview-04-17'; // Default model
+
+        // Language data for localization
+        const languageData = {
+            'ru': {
+                'chatTab': 'Чат с Poison AI',
+                'imageTab': 'Генерация изображений',
+                'headerSubtitle': 'Введите текст для общения с искусственным интеллектом или опишите изображение для генерации.',
+                'clearChatBtnTitle': 'Чат очищен!',
+                'aiPrefix': 'Poison AI:', // New: AI prefix
+                'userPrefix': 'Вы:', // New: User prefix
+                'aiGreeting': 'Привет, я Poison AI, разработка Poison Team. Чем могу помочь?',
+                'chatInputPlaceholder': 'Введите ваше сообщение...',
+                'sendBtnTitle': 'Отправить сообщение',
+                'galleryBtn': 'Галерея',
+                'cameraBtn': 'Камера',
+                'fileBtn': 'Файл',
+                'loadingText': 'Загрузка...',
+                'imagePromptLabel': 'Описание изображения:',
+                'imagePromptPlaceholderText': 'Введите описание...', // Placeholder text
+                'imagePromptErrorText': 'Пожалуйста, введите описание для генерации.', // Error message text
+                'generateImageBtn': 'Сгенерировать изображение',
+                'generatedImagePlaceholder': 'Ваше изображение появится здесь',
+                'generatedImageText': 'Ваше сгенерированное изображение:',
+                'downloadImageBtn': 'Скачать изображение',
+                'generatingText': 'Генерация...',
+                'copyBtn': 'Скопировать',
+                'copiedText': 'Скопировано!',
+                'settingsTitle': 'Настройки',
+                'settingsThemeTab': 'Тема',
+                'settingsLanguageTab': 'Язык',
+                'settingsModelTab': 'Модель', // New: Model tab title
+                'settingsDevelopersTab': 'Разработчики',
+                'themeLight': 'Светлая',
+                'themeDark': 'Темная',
+                'themeSystem': 'Как в системе',
+                'languageRussian': 'Русский',
+                'languageEnglish': 'Английский',
+                'modelLabel': 'Выберите модель:', // New: Model label
+                'developersTeamMembers': 'Участники команды Poison Team:', // New: Developers info
+                'developersContactInfo': 'Подробности можно узнать у ', // Updated contact info string
+                'developersContactLinkText': '@By_PoisonAI', // Updated link text
+                'developersSupporters': 'Поддерживали: otchim_ksb', // New supporters string
+                'fileAttached': 'Прикреплен файл:',
+                'apiError': 'API Ошибка:',
+                'genericError': 'Ошибка:',
+                'noInputError': 'Пожалуйста, введите сообщение или прикрепите изображение/файл.',
+                'imageFileError': 'Пожалуйста, выберите файл изображения.',
+                'fileReadError': 'Не удалось прочитать файл.',
+                'unsupportedFileError': 'Неподдерживаемый тип файла. Пожалуйста, загрузите изображение или текстовый файл.',
+                'aiResponseError': 'Не удалось получить текстовый ответ от ИИ. Пожалуйста, попробуйте еще раз.',
+                'imageGenError': 'Не удалось сгенерировать изображение. Пожалуйста, попробуйте другое описание.',
+                'noImageToDownload': 'Нет изображения для скачивания.'
+            },
+            'en': {
+                'chatTab': 'Chat with Poison AI',
+                'imageTab': 'Image Generation',
+                'headerSubtitle': 'Enter text to chat with AI or describe an image to generate.',
+                'clearChatBtnTitle': 'Chat cleared!',
+                'aiPrefix': 'Poison AI:', // New: AI prefix
+                'userPrefix': 'You:', // New: User prefix
+                'aiGreeting': 'Hello, I am Poison AI, developed by Poison Team. How can I help you?',
+                'chatInputPlaceholder': 'Type your message...',
+                'sendBtnTitle': 'Send Message',
+                'galleryBtn': 'Gallery',
+                'cameraBtn': 'Camera',
+                'fileBtn': 'File',
+                'loadingText': 'Loading...',
+                'imagePromptLabel': 'Image Description:',
+                'imagePromptPlaceholderText': 'Enter description...', // Placeholder text
+                'imagePromptErrorText': 'Please enter a description for generation.', // Error message text
+                'generateImageBtn': 'Generate Image',
+                'generatedImagePlaceholder': 'Your image will appear here',
+                'generatedImageText': 'Your generated image:',
+                'downloadImageBtn': 'Download Image',
+                'generatingText': 'Generating...',
+                'copyBtn': 'Copy',
+                'copiedText': 'Copied!',
+                'settingsTitle': 'Settings',
+                'settingsThemeTab': 'Theme',
+                'settingsLanguageTab': 'Language',
+                'settingsModelTab': 'Model', // New: Model tab title
+                'settingsDevelopersTab': 'Developers',
+                'themeLight': 'Light',
+                'themeDark': 'Dark',
+                'themeSystem': 'System',
+                'languageRussian': 'Russian',
+                'languageEnglish': 'English',
+                'modelLabel': 'Select model:', // New: Model label
+                'developersTeamMembers': 'Poison Team Members:', // New: Developers info
+                'developersContactInfo': 'More info at ', // Updated contact info string
+                'developersContactLinkText': '@By_PoisonAI', // Updated link text
+                'developersSupporters': 'Supported by: otchim_ksb', // New supporters string
+                'fileAttached': 'Attached file:',
+                'apiError': 'API Error:',
+                'genericError': 'Error:',
+                'noInputError': 'Please enter a message or attach an image/file.',
+                'imageFileError': 'Please select an image file.',
+                'fileReadError': 'Could not read file.',
+                'unsupportedFileError': 'Unsupported file type. Please upload an image or text file.',
+                'aiResponseError': 'Could not get text response from AI. Please try again.',
+                'imageGenError': 'Could not generate image. Please try another description.',
+                'noImageToDownload': 'No image to download.'
+            }
+        };
+
+        /**
+         * Applies the selected theme to the body.
+         * @param {string} theme - 'light', 'dark', or 'system'.
+         */
+        function applyTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('theme', theme);
+            document.body.classList.remove('light-theme', 'dark-theme');
+
+            if (theme === 'system') {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    // Default to light if system is not dark
+                    document.body.classList.add('light-theme');
+                }
+            } else if (theme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else { // 'light'
+                document.body.classList.add('light-theme');
+            }
+            updateThemeButtonsState();
+        }
+
+        /**
+         * Updates the active state of theme selection buttons.
+         */
+        function updateThemeButtonsState() {
+            [themeLightBtn, themeDarkBtn, themeSystemBtn].forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (currentTheme === 'light') themeLightBtn.classList.add('active');
+            else if (currentTheme === 'dark') themeDarkBtn.classList.add('active');
+            else if (currentTheme === 'system') themeSystemBtn.classList.add('active');
+        }
+
+        /**
+         * Applies the selected language to the UI.
+         * @param {string} lang - 'ru' or 'en'.
+         */
+        function applyLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            updateUILanguage();
+            updateLanguageButtonsState();
+        }
+
+        /**
+         * Updates the active state of language selection buttons.
+         */
+        function updateLanguageButtonsState() {
+            [langRuBtn, langEnBtn].forEach(btn => {
+                btn.classList.remove('active');
+            });
+            if (currentLanguage === 'ru') langRuBtn.classList.add('active');
+            else if (currentLanguage === 'en') langEnBtn.classList.add('active');
+        }
+
+        /**
+         * Sets the current Gemini model for chat.
+         * @param {string} modelId - The ID of the Gemini model.
+         */
+        function setChatModel(modelId) {
+            currentModel = modelId;
+            localStorage.setItem('model', modelId);
+            updateModelButtonsState();
+        }
+
+        /**
+         * Updates the active state of model selection buttons.
+         */
+        function updateModelButtonsState() {
+            [model25FlashPreviewBtn, model20FlashBtn, modelGemma327BItBtn].forEach(btn => { // Updated button list
+                btn.classList.remove('active');
+            });
+            if (currentModel === 'gemini-2.5-flash-preview-04-17') model25FlashPreviewBtn.classList.add('active');
+            else if (currentModel === 'gemini-2.0-flash') model20FlashBtn.classList.add('active');
+            else if (currentModel === 'gemma-3-27b-it') modelGemma327BItBtn.classList.add('active'); // Updated condition for Gemma
+        }
+
+        /**
+         * Updates all localizable UI elements based on the current language.
+         */
+        function updateUILanguage() {
+            const lang = currentLanguage;
+            const data = languageData[lang];
+
+            // Main app elements
+            chatTab.textContent = data.chatTab;
+            imageTab.textContent = data.imageTab;
+            headerSubtitle.textContent = data.headerSubtitle;
+            clearChatBtn.title = data.clearChatBtnTitle; // This updates the button's title attribute
+            chatInputPlaceholder.placeholder = data.chatInputPlaceholder;
+            smallSendBtn.title = data.sendBtnTitle;
+            galleryBtnText.textContent = data.galleryBtn;
+            cameraBtnText.textContent = data.cameraBtn;
+            fileBtnText.textContent = data.fileBtn;
+            chatLoadingText.textContent = data.loadingText;
+            imagePromptLabel.textContent = data.imagePromptLabel;
+            stabilityEngineLabel.textContent = data.languageRussian === 'Русский' ? 'Выберите модель (движок):' : 'Select model (engine):'; // Explicitly set for this label
+            imagePromptInputPlaceholder.placeholder = data.imagePromptPlaceholderText; // Set placeholder
+            generateImageBtn.textContent = data.generateImageBtn;
+            generatedImage.alt = data.generatedImagePlaceholder;
+            generatedImageText.textContent = data.generatedImageText;
+            downloadImageBtn.textContent = data.downloadImageBtn;
+            generatingText.textContent = data.generatingText;
+            settingsBtn.title = data.settingsTitle;
+
+            // Settings modal elements
+            settingsTitle.textContent = data.settingsTitle;
+            themeSettingsTab.textContent = data.settingsThemeTab;
+            languageSettingsTab.textContent = data.settingsLanguageTab;
+            modelSettingsTab.textContent = data.settingsModelTab; // Update model tab text
+            developersSettingsTab.textContent = data.settingsDevelopersTab;
+            themeLabel.textContent = data.themeLabel;
+            themeLightBtn.textContent = data.themeLight;
+            themeDarkBtn.textContent = data.themeDark;
+            themeSystemBtn.textContent = data.themeSystem;
+            languageLabel.textContent = data.languageLabel;
+            langRuBtn.textContent = data.languageRussian;
+            langEnBtn.textContent = data.languageEnglish;
+            modelLabel.textContent = data.modelLabel; // Update model label text
+
+            // Developers info
+            devsTeamMembersLabel.textContent = data.developersTeamMembers;
+            // Update contact info and supporters as per image
+            devsContactInfoParagraph.innerHTML = `${data.developersContactInfo}<a id="devs-contact-link" href="https://t.me/By_PoisonAI" target="_blank" class="text-blue-500 hover:underline">${data.developersContactLinkText}</a>`;
+            devsSupporters.textContent = data.developersSupporters;
+
+
+            // Update the greeting message in chat history if it's the initial one
+            const currentAiGreeting = document.querySelector('#chat-history .chat-message.ai #ai-greeting');
+            if (currentAiGreeting) {
+                currentAiGreeting.textContent = data.aiGreeting;
+            }
+
+            // Update prefixes in existing messages
+            const currentAiPrefix = document.querySelector('#chat-history .chat-message.ai .prefix');
+            if (currentAiPrefix) {
+                currentAiPrefix.textContent = data.aiPrefix;
+            }
+            const currentUserPrefixes = document.querySelectorAll('#chat-history .chat-message.user .prefix');
+            currentUserPrefixes.forEach(prefix => {
+                prefix.textContent = data.userPrefix;
+            });
+        }
+
+
+        /**
+         * Formats the raw text from the AI response to include bold, new lines, and code blocks.
+         * This version removes all syntax highlighting.
+         * @param {string} text - The raw text from the AI.
+         * @returns {string} - The HTML formatted text.
+         */
+        function formatChatMessage(text) {
+            // Ensure text is a string before attempting to use string methods
+            if (typeof text !== 'string') {
+                console.warn('formatChatMessage received non-string input:', text);
+                return String(text);
+            }
+
+            let formattedText = text;
+
+            // --- CRITICAL IMPROVEMENT: Aggressively remove all HTML tags, attributes, and problematic characters ---
+            // This regex targets:
+            // 1. Any HTML tag: <...>
+            // 2. Any HTML attribute: class="...", data-something="..."
+            // 3. Specific problematic patterns like 'class=class="syntax-string">'
+            // 4. Stray '>' characters that might be left from malformed input
+            // 5. Any remaining 'syntax-' strings or 'class=' strings
+            // This regex is designed to be very broad to catch any unexpected HTML-like remnants.
+            formattedText = formattedText.replace(/<[^>]*>|class\s*=\s*["'][^"']*["']|data-[^=]*\s*=\s*["'][^"']*["']|syntax-[a-zA-Z-]+|class=|>/g, '');
+            // A final pass to catch any lingering partial or malformed HTML entities or attributes
+            formattedText = formattedText.replace(/&lt;.*?&gt;|\b(class|syntax|string|comment|function|number|keyword)\b/g, '');
+
+
+            // Process Markdown links [text](url) to direct clickable URLs
+            formattedText = formattedText.replace(/\[.*?\]\((https?:\/\/[^\s]+)\)/g, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
+
+            // Process code blocks (```)
+            formattedText = formattedText.replace(/```(.*?)```/gs, (match, codeContent) => {
+                // Store original code content for copying
+                let originalCodeContent = codeContent;
+
+                // Add a space after "Python" if it's the first word in the code block (case-insensitive)
+                if (originalCodeContent.toLowerCase().startsWith('python')) {
+                    // Check if there's no space immediately after "python"
+                    if (!originalCodeContent.toLowerCase().startsWith('python ')) {
+                        originalCodeContent = 'Python ' + originalCodeContent.substring('python'.length);
+                    }
+                }
+
+                // Convert newlines within the code block for display
+                // This will now preserve newlines for display, but the `white-space: pre;` CSS will make it scroll horizontally
+                const displayCode = originalCodeContent; 
+
+                return `<pre class="code-block"><code data-original-code="${encodeURIComponent(originalCodeContent)}">${displayCode}</code></pre>`;
+            });
+
+            // Process bold (**)
+            formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+            // Process new line (*) - as per user's request (start new line before content)
+            formattedText = formattedText.replace(/\*(.*?)\*/g, '<br>$1');
+
+            // Convert any remaining standard newlines to <br> tags (outside code blocks)
+            formattedText = formattedText.replace(/\n/g, '<br>');
+
+            return formattedText;
+        }
+
+        /**
+         * Adds a message to the chat history.
+         * @param {string} text - The message text.
+         * @param {string} sender - The sender ('user' или 'ai').
+         * @param {string|null} imageUrl - URL изображения, если есть.
+         * @param {string|null} fileName - Имя прикрепленного файла, если есть.
+         */
+        function addMessageToChat(text, sender, imageUrl = null, fileName = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', sender);
+
+            const prefixSpan = document.createElement('span');
+            prefixSpan.classList.add('prefix');
+
+            if (sender === 'ai') {
+                prefixSpan.textContent = languageData[currentLanguage].aiPrefix; // Use localized AI prefix
+                messageDiv.appendChild(prefixSpan);
+                const textContentContainer = document.createElement('span');
+                textContentContainer.innerHTML = " " + formatChatMessage(text); // Используем innerHTML для форматированного текста
+                messageDiv.appendChild(textContentContainer);
+
+                // Add copy buttons to code blocks for AI messages
+                const codeBlocks = textContentContainer.querySelectorAll('.code-block');
+                codeBlocks.forEach(codeBlock => {
+                    const copyButton = document.createElement('button');
+                    copyButton.textContent = languageData[currentLanguage].copyBtn;
+                    copyButton.classList.add('copy-code-btn');
+
+                    copyButton.addEventListener('click', () => {
+                        // Retrieve the original, unhighlighted code content from the data attribute
+                        const codeContent = decodeURIComponent(codeBlock.querySelector('code').dataset.originalCode);
+                        
+                        // Use document.execCommand('copy') for better iframe compatibility
+                        const textarea = document.createElement('textarea');
+                        textarea.value = codeContent;
+                        // Ensure textarea preserves all whitespace for accurate copying
+                        textarea.style.whiteSpace = 'pre';
+                        textarea.style.overflow = 'hidden';
+                        textarea.style.position = 'absolute';
+                        textarea.style.left = '-9999px'; // Move off-screen
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        try {
+                            const successful = document.execCommand('copy');
+                            if (successful) {
+                                copyButton.textContent = languageData[currentLanguage].copiedText;
+                                setTimeout(() => {
+                                    copyButton.textContent = languageData[currentLanguage].copyBtn;
+                                }, 2000);
+                            } else {
+                                showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error'); // Reusing fileReadError for generic copy error
+                            }
+                        } catch (err) {
+                            console.error('Ошибка при копировании:', err);
+                            showMessageBanner(globalErrorBanner, languageData[currentLanguage].genericError + ' ' + languageData[currentLanguage].fileReadError, 'error');
+                        } finally {
+                            document.body.removeChild(textarea);
+                        }
+                    });
+                    codeBlock.appendChild(copyButton);
+                });
+
+            } else { // User message
+                prefixSpan.textContent = languageData[currentLanguage].userPrefix; // Use localized User prefix
+                messageDiv.appendChild(prefixSpan);
+                const textNode = document.createElement('span');
+                textNode.textContent = " " + text;
+                messageDiv.appendChild(textNode);
+                if (imageUrl) {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = imageUrl;
+                    imgElement.alt = languageData[currentLanguage].fileAttached;
+                    imgElement.classList.add('mt-2', 'rounded-md', 'max-w-full', 'h-auto', 'max-h-40', 'object-contain');
+                    messageDiv.appendChild(imgElement);
+                }
+                if (fileName && !imageUrl) { // Only show file name if it's not an image (images have their own preview)
+                    const fileSpan = document.createElement('span');
+                    fileSpan.classList.add('block', 'text-xs', 'text-gray-500', 'mt-1');
+                    fileSpan.textContent = `${languageData[currentLanguage].fileAttached} ${fileName}`;
+                    messageDiv.appendChild(fileSpan);
+                }
+            }
+
+            chatHistoryDiv.appendChild(messageDiv);
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+        }
+
+        /**
+         * Shows a global message banner with a smooth transition.
+         * @param {HTMLElement} element - The DOM element to show the message in (globalErrorBanner or globalSuccessBanner).
+         * @param {string} message - The message text.
+         * @param {string} type - 'error' or 'success'.
+         */
+        function showMessageBanner(element, message, type) {
+            // Скрыть другой баннер, если он активен
+            if (type === 'error') {
+                hideMessageBanner(globalSuccessBanner);
+            } else {
+                hideMessageBanner(globalErrorBanner);
+            }
+
+            element.textContent = message;
+            // Убедимся, что классы типа всегда устанавливаются корректно
+            element.classList.remove('error', 'success'); // Сначала удаляем, потом добавляем
+            element.classList.add(type, 'show');
+
+            // Set a timeout to hide the banner after 3 seconds
+            setTimeout(() => {
+                hideMessageBanner(element);
+            }, 3000); // 3 секунды
+        }
+
+        /**
+         * Hides a global message banner with a smooth transition.
+         * @param {HTMLElement} element - The DOM element to hide the message in.
+         */
+        function hideMessageBanner(element) {
+            element.classList.remove('show');
+            // Remove type classes after the transition completes
+            element.addEventListener('transitionend', function handler() {
+                // Check if the banner is actually hidden (opacity is 0) before removing type classes
+                if (window.getComputedStyle(element).opacity === '0') {
+                    element.classList.remove('error', 'success');
+                }
+                element.removeEventListener('transitionend', handler);
+            }, { once: true });
+        }
+
+        /**
+         * Switches between chat and image generation views.
+         * @param {string} viewId - The ID of the view to activate ('chat-view', 'image-view').
+         */
+        function switchView(viewId) {
+            // Deactivate all tabs and content views
+            document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Hide any active error/success messages when switching views
+            hideMessageBanner(globalErrorBanner);
+            hideMessageBanner(globalSuccessBanner);
+
+            // Activate the selected tab and content view
+            if (viewId === 'chat-view') {
+                chatTab.classList.add('active');
+                chatView.classList.add('active');
+            } else if (viewId === 'image-view') {
+                imageTab.classList.add('active');
+                imageView.classList.add('active');
+            }
+        }
+
+        /**
+         * Clears the chat history.
+         */
+        function clearChat() {
+            chatHistoryDiv.innerHTML = `
+                <div class="chat-message ai">
+                    <span class="prefix" id="ai-prefix-cleared">${languageData[currentLanguage].aiPrefix}</span> <span id="ai-greeting-cleared">${languageData[currentLanguage].aiGreeting}</span>
+                </div>
+            `;
+            // Ensure the ai-greeting span is updated if it was just cleared
+            const aiGreetingCleared = document.getElementById('ai-greeting-cleared');
+            if (aiGreetingCleared) {
+                aiGreetingCleared.textContent = languageData[currentLanguage].aiGreeting;
+            }
+            const aiPrefixCleared = document.getElementById('ai-prefix-cleared');
+            if (aiPrefixCleared) {
+                aiPrefixCleared.textContent = languageData[currentLanguage].aiPrefix;
+            }
+
+
+            chatHistory = [{ role: "model", parts: [{ text: languageData[currentLanguage].aiGreeting }] }];
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+            // Now, use the updated clearChatBtnTitle for the success message
+            showMessageBanner(globalSuccessBanner, languageData[currentLanguage].clearChatBtnTitle, 'success');
+        }
+
+        /**
+         * Clears all attached file previews and data.
+         */
+        function clearAttachments() {
+            attachedImageData = null;
+            attachedImageMimeType = null;
+            attachedFileData = null;
+            attachedFileMimeType = null;
+            attachedFileName = null;
+
+            filePreviewImage.src = '';
+            filePreviewImage.classList.add('hidden'); // Hide image preview
+            filePreviewIcon.classList.add('hidden'); // Hide file icon
+            filePreviewFilename.textContent = '';
+            fileUploadPreview.classList.add('hidden'); // Hide the whole preview container
+            fileUploadPreview.classList.remove('flex'); // Ensure display:flex is removed
+
+            fileInput.value = ''; // Reset chosen file from gallery
+            cameraInput.value = ''; // Reset captured photo
+            generalFileInput.value = ''; // Reset general file input
+        }
+
+        /**
+         * Handles sending a message to the AI.
+         */
+        async function sendMessage() {
+            hideMessageBanner(globalErrorBanner);
+            const prompt = chatInput.value.trim();
+
+            if (!prompt && !attachedImageData && !attachedFileData) {
+                showMessageBanner(globalErrorBanner, languageData[currentLanguage].noInputError, 'error');
+                return;
+            }
+
+            // Add user message to UI chat history
+            addMessageToChat(prompt, 'user', attachedImageData ? attachedImageData : null, attachedFileName);
+            chatInput.value = ''; // Clear text input field
+            resetChatInputHeight(); // Reset height after sending
+
+            chatLoading.classList.remove('hidden'); // Show loading spinner
+            chatLoadingText.textContent = languageData[currentLanguage].loadingText; // Set loading text
+            smallSendBtn.disabled = true;
+            choosePhotoBtn.disabled = true;
+            takePhotoBtn.disabled = true;
+            uploadFileBtn.disabled = true;
+            document.body.style.cursor = 'wait'; // Show wait cursor
+
+
+            try {
+                const payloadContents = [];
+
+                // Iterate through existing chatHistory to build payload for API
+                for (const entry of chatHistory) {
+                    const partsForApi = [];
+                    for (const part of entry.parts) {
+                        if (part.text) {
+                            let textContent = part.text;
+                            // Remove "Poison AI:" prefix for previous model messages when sending to API
+                            if (entry.role === 'model' && (textContent.startsWith(languageData['ru'].aiPrefix) || textContent.startsWith(languageData['en'].aiPrefix))) {
+                                textContent = textContent.substring(textContent.indexOf(':') + 1).trim();
+                            }
+                            // Remove "Вы:" prefix for previous user messages when sending to API
+                            if (entry.role === 'user' && (textContent.startsWith(languageData['ru'].userPrefix) || textContent.startsWith(languageData['en'].userPrefix))) {
+                                textContent = textContent.substring(textContent.indexOf(':') + 1).trim();
+                            }
+                            partsForApi.push({ text: textContent });
+                        } else if (part.inlineData) {
+                            // Include image data as is for previous turns
+                            partsForApi.push(part);
+                        }
+                    }
+                    payloadContents.push({ role: entry.role, parts: partsForApi });
+                }
+
+                // Add current user prompt and attached data (if any) to payload
+                const currentUserParts = [];
+                if (prompt) {
+                    currentUserParts.push({ text: prompt });
+                }
+                if (attachedImageData && attachedImageMimeType) {
+                    currentUserParts.push({
+                        inlineData: {
+                            mimeType: attachedImageMimeType,
+                            data: attachedImageData.split(',')[1] // Get base64 data without prefix
+                        }
+                    });
+                } else if (attachedFileData && attachedFileMimeType) {
+                    currentUserParts.push({
+                        text: `${languageData[currentLanguage].fileAttached} "${attachedFileName}":\n\`\`\`\n${attachedFileData}\n\`\`\``
+                    });
+                }
+                payloadContents.push({ role: "user", parts: currentUserParts }); // Add current user turn
+
+                const payload = { contents: payloadContents };
+
+                // Use the currentModel for the API call
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${geminiApiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`${languageData[currentLanguage].apiError} ${errorData.error.message || response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                // Check if result.candidates[0].content.parts[0].text exists and is a string
+                let aiText = languageData[currentLanguage].aiResponseError; // Default error message
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0 &&
+                    typeof result.candidates[0].content.parts[0].text === 'string') {
+                    aiText = result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Неожиданная структура ответа от AI или отсутствует текстовое содержимое:", result);
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].aiResponseError, 'error');
+                }
+                
+                addMessageToChat(aiText, 'ai');
+                // Save original user prompt and attached data to chatHistory for future context
+                const userHistoryParts = [{ text: prompt }];
+                if (attachedImageData && attachedImageMimeType) {
+                    userHistoryParts.push({ inlineData: { mimeType: attachedImageMimeType, data: attachedImageData.split(',')[1] } });
+                } else if (attachedFileData && attachedFileMimeType) {
+                    userHistoryParts.push({ text: `${languageData[currentLanguage].fileAttached} "${attachedFileName}":\n\`\`\`\n${attachedFileData}\n\`\`\`` });
+                }
+                chatHistory.push({ role: "user", parts: userHistoryParts });
+                chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+
+            } catch (error) {
+                console.error("Ошибка при отправке сообщения:", error);
+                showMessageBanner(globalErrorBanner, `${languageData[currentLanguage].genericError} ${error.message}. ${languageData[currentLanguage].aiResponseError}`, 'error');
+            } finally {
+                chatLoading.classList.add('hidden'); // Hide loading spinner
+                smallSendBtn.disabled = false;
+                choosePhotoBtn.disabled = false;
+                takePhotoBtn.disabled = false;
+                uploadFileBtn.disabled = false;
+                document.body.style.cursor = 'default'; // Restore default cursor
+                clearAttachments(); // Clear all attachments after sending
+            }
+        }
+
+        /**
+         * Handles generating an image using Stability AI.
+         */
+        async function generateImage() {
+            // Ensure we are on the image generation tab
+            switchView('image-view');
+
+            hideMessageBanner(globalErrorBanner);
+            hideMessageBanner(globalSuccessBanner);
+            downloadImageBtn.classList.add('hidden'); // Hide download button
+
+            const prompt = imagePromptInput.value.trim();
+            const engineId = stabilityEngineSelect.value; // Get selected engine ID
+
+            if (!prompt) {
+                showMessageBanner(globalErrorBanner, languageData[currentLanguage].imagePromptErrorText, 'error');
+                return;
+            }
+
+            // Set placeholder image and alt text for loading state
+            generatedImage.src = `https://placehold.co/400x300/e2e8f0/6b7280?text=${encodeURIComponent(languageData[currentLanguage].generatingText)}`;
+            generatedImage.alt = languageData[currentLanguage].generatingText;
+
+            imageLoading.classList.remove('hidden');
+            generateImageBtn.disabled = true;
+            document.body.style.cursor = 'wait'; // Show wait cursor
+
+
+            try {
+                const apiUrl = `https://api.stability.ai/v1/generation/${engineId}/text-to-image`;
+
+                const payload = {
+                    text_prompts: [
+                        {
+                            text: prompt,
+                            weight: 1,
+                        },
+                    ],
+                    cfg_scale: 7,
+                    height: 1024, // Default for SDXL
+                    width: 1024,  // Default for SDXL
+                    samples: 1,
+                    steps: 30,
+                    seed: 0,
+                    style_preset: "photographic", // Can be changed or removed
+                };
+
+                // Adjust dimensions for older Stable Diffusion models
+                if (engineId === "stable-diffusion-v1-6") { // Removed stable-diffusion-v1-5
+                    payload.height = 512;
+                    payload.width = 512;
+                }
+
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${stabilityApiKey}`, // Use Stability AI API key here
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errorMsg = `${languageData[currentLanguage].apiError} ${response.status} - ${response.statusText}`;
+                    if (errorData && errorData.message) {
+                        errorMsg += `: ${errorData.message}`;
+                    } else if (errorData && errorData.errors && errorData.errors.length > 0) {
+                        errorMsg += `: ${errorData.errors.map(e => e.message).join(', ')}`;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json();
+
+                if (data.artifacts && data.artifacts.length > 0 && data.artifacts[0].base64) {
+                    const base64Image = data.artifacts[0].base64;
+                    generatedImage.src = `data:image/png;base64,${base64Image}`;
+                    generatedImage.alt = languageData[currentLanguage].generatedImageText;
+                    downloadImageBtn.classList.remove('hidden'); // Show download button
+                    showMessageBanner(globalSuccessBanner, languageData[currentLanguage].generateImageBtn, 'success');
+                    // imagePromptInput.value = ''; // Do NOT clear input after successful generation
+                } else {
+                    throw new Error(languageData[currentLanguage].imageGenError);
+                }
+            } catch (error) {
+                console.error("Ошибка при генерации изображения:", error);
+                showMessageBanner(globalErrorBanner, `${languageData[currentLanguage].genericError} ${error.message}. ${languageData[currentLanguage].imageGenError}`, 'error');
+                generatedImage.src = `https://placehold.co/400x300/e2e8f0/6b7280?text=${encodeURIComponent(languageData[currentLanguage].genericError)}`;
+                generatedImage.alt = languageData[currentLanguage].genericError;
+            } finally {
+                imageLoading.classList.add('hidden');
+                generateImageBtn.disabled = false;
+                document.body.style.cursor = 'default'; // Restore default cursor
+                // Ensure we stay on the image generation tab
+                switchView('image-view');
+            }
+        }
+
+        /**
+         * Downloads the generated image.
+         */
+        function downloadImage() {
+            const imageUrl = generatedImage.src;
+            if (imageUrl && !imageUrl.includes("placehold.co")) {
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                a.download = 'poison_ai_image.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                showMessageBanner(globalErrorBanner, languageData[currentLanguage].noImageToDownload, 'error');
+            }
+        }
+
+        /**
+         * Adjusts the height of the chat input textarea based on content.
+         */
+        function adjustChatInputHeight() {
+            chatInput.style.height = 'auto'; // Reset height to recalculate scrollHeight
+            // Set height to scrollHeight, but cap at expandedChatInputHeight
+            if (chatInput.scrollHeight > expandedChatInputHeight) {
+                chatInput.style.height = expandedChatInputHeight + 'px';
+                chatInput.style.overflowY = 'auto'; // Enable scroll if content exceeds double height
+            } else {
+                chatInput.style.height = chatInput.scrollHeight + 'px';
+                chatInput.style.overflowY = 'hidden';
+            }
+        }
+
+        /**
+         * Resets the chat input textarea height to its initial size.
+         */
+        function resetChatInputHeight() {
+            chatInput.style.height = initialChatInputHeight + 'px';
+            chatInput.style.overflowY = 'hidden';
+        }
+
+        /**
+         * Opens the settings modal.
+         */
+        function openSettingsModal() {
+            settingsModalOverlay.classList.add('show');
+            // Ensure the correct tab is active when opening
+            switchSettingsTab('theme-settings-content');
+        }
+
+        /**
+         * Closes the settings modal.
+         */
+        function closeSettingsModal() {
+            settingsModalOverlay.classList.remove('show');
+        }
+
+        /**
+         * Switches between settings tabs.
+         * @param {string} tabContentId - The ID of the tab content to activate.
+         */
+        function switchSettingsTab(tabContentId) {
+            // Deactivate all settings tabs and content
+            document.querySelectorAll('.settings-tabs button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.settings-tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate the selected tab and content
+            if (tabContentId === 'theme-settings-content') {
+                themeSettingsTab.classList.add('active');
+                themeSettingsContent.classList.add('active');
+            } else if (tabContentId === 'language-settings-content') {
+                languageSettingsTab.classList.add('active');
+                languageSettingsContent.classList.add('active');
+            } else if (tabContentId === 'model-settings-content') { // New case for model settings
+                modelSettingsTab.classList.add('active');
+                modelSettingsContent.classList.add('active');
+            } else if (tabContentId === 'developers-settings-content') {
+                developersSettingsTab.classList.add('active');
+                developersSettingsContent.classList.add('active');
+            }
+        }
+
+
+        // Event listeners
+        chatTab.addEventListener('click', () => switchView('chat-view'));
+        imageTab.addEventListener('click', () => switchView('image-view'));
+        smallSendBtn.addEventListener('click', sendMessage); // Normal send
+
+        generateImageBtn.addEventListener('click', generateImage);
+        downloadImageBtn.addEventListener('click', downloadImage);
+        clearChatBtn.addEventListener('click', clearChat);
+
+        // Event listeners for file attachments
+        choosePhotoBtn.addEventListener('click', () => fileInput.click());
+        takePhotoBtn.addEventListener('click', () => cameraInput.click());
+        uploadFileBtn.addEventListener('click', () => generalFileInput.click());
+        removeFileBtn.addEventListener('click', clearAttachments);
+
+        // Textarea input event for dynamic resizing
+        chatInput.addEventListener('input', adjustChatInputHeight);
+
+        // New: Event listener for image prompt input to show/hide clear button
+        imagePromptInput.addEventListener('input', () => {
+            if (imagePromptInput.value.trim() !== '') {
+                clearImagePromptBtn.style.display = 'block';
+            } else {
+                clearImagePromptBtn.style.display = 'none';
+            }
+        });
+
+        // New: Event listener for clear image prompt button
+        clearImagePromptBtn.addEventListener('click', () => {
+            imagePromptInput.value = '';
+            clearImagePromptBtn.style.display = 'none';
+        });
+
+
+        // Settings Modal Event Listeners
+        settingsBtn.addEventListener('click', openSettingsModal);
+        settingsModalCloseBtn.addEventListener('click', closeSettingsModal);
+        settingsModalOverlay.addEventListener('click', (e) => {
+            if (e.target === settingsModalOverlay) { // Close only if clicking on overlay, not content
+                closeSettingsModal();
+            }
+        });
+
+        themeSettingsTab.addEventListener('click', () => switchSettingsTab('theme-settings-content'));
+        languageSettingsTab.addEventListener('click', () => switchSettingsTab('language-settings-content'));
+        modelSettingsTab.addEventListener('click', () => switchSettingsTab('model-settings-content')); // Event listener for new model tab
+        developersSettingsTab.addEventListener('click', () => switchSettingsTab('developers-settings-content'));
+
+        themeLightBtn.addEventListener('click', () => applyTheme('light'));
+        themeDarkBtn.addEventListener('click', () => applyTheme('dark'));
+        themeSystemBtn.addEventListener('click', () => applyTheme('system'));
+
+        langRuBtn.addEventListener('click', () => applyLanguage('ru'));
+        langEnBtn.addEventListener('click', () => applyLanguage('en'));
+
+        // Event listeners for model selection buttons
+        model25FlashPreviewBtn.addEventListener('click', () => setChatModel('gemini-2.5-flash-preview-04-17'));
+        model20FlashBtn.addEventListener('click', () => setChatModel('gemini-2.0-flash'));
+        modelGemma327BItBtn.addEventListener('click', () => setChatModel('gemma-3-27b-it')); // Updated event listener for Gemma
+
+
+        // Handler for choosing image file from gallery
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].imageFileError, 'error');
+                    clearAttachments();
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    attachedImageData = e.target.result; // Base64 string
+                    attachedImageMimeType = file.type;
+                    attachedFileData = null; // Clear any text file data
+                    attachedFileMimeType = null;
+                    attachedFileName = file.name;
+
+                    filePreviewImage.src = attachedImageData;
+                    filePreviewImage.classList.remove('hidden');
+                    filePreviewIcon.classList.add('hidden'); // Hide file icon
+                    filePreviewFilename.textContent = file.name;
+                    fileUploadPreview.classList.remove('hidden');
+                    fileUploadPreview.classList.add('flex');
+                };
+                reader.onerror = () => {
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error');
+                    clearAttachments();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                clearAttachments();
+            }
+        });
+
+        // Handler for capturing photo from camera
+        cameraInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].imageFileError, 'error');
+                    clearAttachments();
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    attachedImageData = e.target.result; // Base64 string
+                    attachedImageMimeType = file.type;
+                    attachedFileData = null; // Clear any text file data
+                    attachedFileMimeType = null;
+                    attachedFileName = file.name;
+
+                    filePreviewImage.src = attachedImageData;
+                    filePreviewImage.classList.remove('hidden');
+                    filePreviewIcon.classList.add('hidden'); // Hide file icon
+                    filePreviewFilename.textContent = file.name;
+                    fileUploadPreview.classList.remove('hidden');
+                    fileUploadPreview.classList.add('flex');
+                };
+                reader.onerror = () => {
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error');
+                    clearAttachments();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                clearAttachments();
+            }
+        });
+
+        // Handler for general file upload
+        generalFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Check if it's an image
+                if (file.type.startsWith('image/')) {
+                    // If it's an image, use the image handling logic
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        attachedImageData = e.target.result;
+                        attachedImageMimeType = file.type;
+                        attachedFileData = null; // Clear any text file data
+                        attachedFileMimeType = null;
+                        attachedFileName = file.name;
+
+                        filePreviewImage.src = attachedImageData;
+                        filePreviewImage.classList.remove('hidden');
+                        filePreviewIcon.classList.add('hidden'); // Hide file icon
+                        filePreviewFilename.textContent = file.name;
+                        fileUploadPreview.classList.remove('hidden');
+                        fileUploadPreview.classList.add('flex');
+                    };
+                    reader.onerror = () => {
+                        showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error');
+                        clearAttachments();
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith('text/') || file.type === 'application/json' || file.type === 'application/xml' || file.name.endsWith('.md') || file.name.endsWith('.csv') || file.name.endsWith('.html')) {
+                    // Handle text-based files
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        attachedFileData = e.target.result; // Raw text content
+                        attachedFileMimeType = file.type;
+                        attachedFileName = file.name;
+                        attachedImageData = null; // Clear any image data
+                        attachedImageMimeType = null;
+
+                        filePreviewImage.classList.add('hidden'); // Hide image preview
+                        filePreviewIcon.classList.add('hidden'); // Hide file icon (was showing extension)
+                        filePreviewFilename.textContent = file.name;
+                        fileUploadPreview.classList.remove('hidden');
+                        fileUploadPreview.classList.add('flex');
+                    };
+                    reader.onerror = () => {
+                        showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error');
+                        clearAttachments();
+                    };
+                    reader.readAsText(file);
+                } else {
+                    // Unsupported file type
+                    showMessageBanner(globalErrorBanner, languageData[currentLanguage].unsupportedFileError, 'error');
+                    clearAttachments();
+                }
+            } else {
+                clearAttachments();
+            }
+        });
+
+
+        // Initialize view on load
+        window.onload = () => {
+            // Apply theme and language from localStorage or system preference
+            applyTheme(currentTheme);
+            applyLanguage(currentLanguage);
+            setChatModel(currentModel); // Set initial model
+            
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                if (currentTheme === 'system') {
+                    applyTheme('system'); // Re-apply system theme
+                }
+            });
+
+            switchView('chat-view'); // Default to chat view
+            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
+            document.body.classList.add('loaded'); // Add class for app-container animation
+            resetChatInputHeight(); // Set initial height for textarea
+            // Initialize clear button state for image prompt
+            if (imagePromptInput.value.trim() !== '') {
+                clearImagePromptBtn.style.display = 'block';
+            } else {
+                clearImagePromptBtn.style.display = 'none';
+            }
+
+            // Ensure loading indicators are hidden on load
+            chatLoading.classList.add('hidden');
+            imageLoading.classList.add('hidden');
+        };
+    </script>
+</body>
+</html>
+
