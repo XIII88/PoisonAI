@@ -8,9 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables for theming */
         body {
-            /* Light theme defaults */
             --bg-primary: #f0f4f8;
             --bg-secondary: #ffffff;
             --text-primary: #333;
@@ -23,25 +21,24 @@
             --code-text: #4a5568;
             --copy-btn-bg: rgba(0, 0, 0, 0.7);
             --copy-btn-hover-bg: rgba(0, 0, 0, 0.9);
-            --modal-bg: rgba(0, 0, 0, 0.5); /* Overlay background */
+            --modal-bg: rgba(0, 0, 0, 0.5);
             --modal-content-bg: #ffffff;
             --modal-content-text: #333;
             --settings-tab-inactive-bg: #f8fafc;
-            --prefix-ai-color: #10b981; /* Green for light theme */
-            --prefix-user-color: #4f46e5; /* Purple/Indigo for light theme */
-            --loading-text-color: #6b7280; /* Default for light theme */
+            --prefix-ai-color: #10b981;
+            --prefix-user-color: #4f46e5;
+            --loading-text-color: #6b7280;
         }
 
         body.dark-theme {
-            /* Dark theme overrides */
-            --bg-primary: #1a202c; /* Dark background */
-            --bg-secondary: #2d3748; /* Darker content background */
-            --text-primary: #e2e8f0; /* Light text */
-            --text-secondary: #a0aec0; /* Lighter gray text */
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
             --border-color: #4a5568;
             --chat-history-bg: #2d3748;
-            --chat-user-bg: #4c51bf; /* Darker blue for user */
-            --chat-ai-bg: #38a169; /* Darker green for AI */
+            --chat-user-bg: #4c51bf;
+            --chat-ai-bg: #38a169;
             --code-bg: #4a5568;
             --code-text: #e2e8f0;
             --copy-btn-bg: rgba(255, 255, 255, 0.2);
@@ -50,12 +47,11 @@
             --modal-content-bg: #1a202c;
             --modal-content-text: #e2e8f0;
             --settings-tab-inactive-bg: #2d3748;
-            --prefix-ai-color: #e2e8f0; /* Very light gray for dark theme */
-            --prefix-user-color: #e2e8f0; /* Very light gray for dark theme */
-            --loading-text-color: #ffffff; /* White for dark theme */
+            --prefix-ai-color: #e2e8f0;
+            --prefix-user-color: #e2e8f0;
+            --loading-text-color: #ffffff;
         }
 
-        /* Apply variables */
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-primary);
@@ -68,7 +64,11 @@
             padding: 1rem;
             box-sizing: border-box;
             cursor: default;
-            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        body.modal-open {
+            overflow: hidden;
         }
 
         .app-container {
@@ -95,7 +95,7 @@
             padding: 1.5rem;
             text-align: center;
             border-bottom: 1px solid var(--border-color);
-            position: relative; /* For settings button positioning */
+            position: relative;
         }
         .app-header h1 {
             font-size: 2.5rem;
@@ -108,7 +108,6 @@
             line-height: 1.5;
         }
 
-        /* Settings button in header */
         #settings-btn {
             position: absolute;
             top: 1.5rem;
@@ -118,12 +117,12 @@
             cursor: pointer;
             color: var(--text-secondary);
             transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
-            padding: 0.5rem; /* Make it easier to click */
-            border-radius: 0.5rem; /* Slightly rounded */
+            padding: 0.5rem;
+            border-radius: 0.5rem;
         }
         #settings-btn:hover {
             color: var(--text-primary);
-            transform: rotate(30deg); /* Small rotation on hover */
+            transform: rotate(30deg);
         }
 
         .nav-tabs {
@@ -194,7 +193,7 @@
         }
 
         .chat-message {
-            max-width: 85%; /* Default for user, overridden for AI */
+            max-width: 85%;
             padding: 0.75rem 1rem;
             border-radius: 0.75rem;
             word-wrap: break-word;
@@ -207,23 +206,23 @@
             align-self: flex-end;
             text-align: left;
             color: var(--text-primary);
-            max-width: 90%; /* Changed to 90% as requested */
+            max-width: 90%;
         }
         .chat-message.ai {
             background-color: var(--chat-ai-bg);
             align-self: flex-start;
             text-align: left;
             color: var(--text-primary);
-            max-width: 95%; /* AI messages remain 95% */
+            max-width: 95%;
         }
         .chat-message .prefix {
             font-weight: 600;
             margin-right: 0.25rem;
-            color: var(--prefix-ai-color); /* Use CSS variable for AI prefix */
+            color: var(--prefix-ai-color);
             transition: color 0.3s ease;
         }
         .chat-message.user .prefix {
-            color: var(--prefix-user-color); /* Use CSS variable for user prefix */
+            color: var(--prefix-user-color);
             transition: color 0.3s ease;
         }
 
@@ -234,14 +233,14 @@
             padding: 0.5rem;
             border-radius: 9999px;
             background-color: #dc2626;
-            color: white; /* This color is for the SVG fill */
+            color: white;
             border: 1px solid #b91c1c;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             transition: all 0.2s ease-in-out;
             opacity: 1;
             pointer-events: auto;
             z-index: 10;
-            display: flex; /* For centering SVG */
+            display: flex;
             align-items: center;
             justify-content: center;
         }
@@ -323,7 +322,7 @@
             gap: 0.5rem;
             margin-bottom: 0.75rem;
             padding: 0.5rem;
-            background-color: var(--code-bg); /* Use code bg for preview */
+            background-color: var(--code-bg);
             border-radius: 0.75rem;
             border: 1px solid var(--border-color);
             max-width: 100%;
@@ -431,7 +430,7 @@
 
         .image-input-area {
             margin-bottom: 1rem;
-            position: relative; /* Added for clear button positioning */
+            position: relative;
         }
         .image-input-area label {
             display: block;
@@ -440,9 +439,8 @@
             color: var(--text-primary);
             transition: color 0.3s ease;
         }
-        /* Specific style for the image generation model label in dark theme */
         body.dark-theme label[for="stabilityEngineSelect"] {
-            color: #FFFFFF !important; /* Force white in dark theme */
+            color: #FFFFFF !important;
         }
         #image-prompt-input {
             width: 100%;
@@ -455,7 +453,7 @@
             min-height: 4rem;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
             transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-            padding-right: 2.5rem; /* Make space for the clear button */
+            padding-right: 2.5rem;
         }
         #image-prompt-input:focus {
             outline: none;
@@ -463,31 +461,28 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
         }
 
-        /* Clear button for image prompt input */
         #clear-image-prompt-btn {
             position: absolute;
             right: 0.75rem;
-            /* Calculate top based on label height (approx 1.5rem) + label margin-bottom (0.5rem) + input padding-top (0.75rem) */
-            /* Aim for vertical center of the input field */
-            top: calc(1.5rem + 0.5rem + 0.75rem); /* Adjust this value as needed for perfect alignment */
-            transform: translateY(-50%); /* Vertically center the button itself */
+            top: calc(1.5rem + 0.5rem + 0.75rem);
+            transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-secondary); /* Use text-secondary for better visibility in light theme */
-            font-size: 1.5rem; /* Increased size */
+            color: var(--text-secondary);
+            font-size: 1.5rem;
             cursor: pointer;
-            display: none; /* Hidden by default, shown when text is present */
+            display: none;
             transition: color 0.2s ease-in-out;
             padding: 0.2rem;
         }
         #clear-image-prompt-btn:hover {
-            color: var(--text-primary); /* Darker on hover */
+            color: var(--text-primary);
         }
         body.dark-theme #clear-image-prompt-btn {
-            color: #a0aec0; /* Lighter gray for dark theme */
+            color: #a0aec0;
         }
         body.dark-theme #clear-image-prompt-btn:hover {
-            color: #e2e8f0; /* White on hover in dark theme */
+            color: #e2e8f0;
         }
 
 
@@ -518,7 +513,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border-color);
             object-fit: contain;
-            /* Reverted max-height to original state (no specific max-height) */
             transition: border-color 0.3s ease;
         }
 
@@ -554,21 +548,19 @@
             border-bottom-color: #6366f1;
         }
 
-        /* Styling for loading text to be white in dark theme and centered */
         #chat-loading, #image-loading {
-            display: flex; /* Use flexbox for centering */
-            align-items: center; /* Vertically center with spinner */
-            justify-content: center; /* Horizontally center spinner and text */
-            gap: 0.5rem; /* Space between spinner and text */
-            margin-top: 1rem; /* Adjust margin as needed */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
         }
 
         #chat-loading-text, #generating-text {
-            color: var(--loading-text-color); /* Use CSS variable for color */
+            color: var(--loading-text-color);
             font-weight: 500;
         }
 
-        /* Ensure hidden class always sets display to none */
         .hidden {
             display: none !important;
         }
@@ -584,12 +576,12 @@
             padding: 0.75rem;
             border-radius: 0.5rem;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            white-space: pre; /* Preserve whitespace and prevent wrapping */
-            word-break: normal; /* Do not break words */
+            white-space: pre;
+            word-break: normal;
             margin-top: 0.5rem;
             margin-bottom: 0.5rem;
-            color: var(--code-text); /* Default text color for code block */
-            overflow-x: auto; /* Enable horizontal scrolling */
+            color: var(--code-text);
+            overflow-x: auto;
             border: 1px solid var(--border-color);
             position: relative;
             padding-top: 1.5rem;
@@ -618,7 +610,6 @@
         #generate-image-btn { background: linear-gradient(to right, #8b5cf6, #6366f1); }
         #generate-image-btn:hover:not(:disabled) { background: linear-gradient(to right, #6366f1, #8b5cf6); transform: translateY(-1px); }
 
-        /* Settings Modal Styles */
         .settings-modal-overlay {
             position: fixed;
             top: 0;
@@ -653,7 +644,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
-            max-height: 90vh; /* Limit modal height */
+            max-height: 90vh;
         }
         .settings-modal-overlay.show .settings-modal-content {
             transform: translateY(0);
@@ -705,8 +696,8 @@
             display: none;
             flex-direction: column;
             gap: 1rem;
-            overflow-y: auto; /* Allow scrolling for content if needed */
-            padding-top: 0.5rem; /* Small padding after tabs */
+            overflow-y: auto;
+            padding-top: 0.5rem;
         }
         .settings-tab-content.active {
             display: flex;
@@ -880,7 +871,8 @@
             <div class="settings-tabs">
                 <button id="theme-settings-tab" class="active">Тема</button>
                 <button id="language-settings-tab">Язык</button>
-                <button id="model-settings-tab">Модель</button> <button id="developers-settings-tab">Разработчики</button>
+                <button id="model-settings-tab">Модель</button>
+                <button id="developers-settings-tab">Разработчики</button>
             </div>
 
             <div id="theme-settings-content" class="settings-tab-content active">
@@ -908,10 +900,11 @@
                 <div class="settings-option-group">
                     <label id="model-label">Выберите модель:</label>
                     <div class="settings-option-buttons">
-                        <!-- Updated data-model-id for 2.5-flash-preview-5.20 -->
+                        <button id="model-2-5-pro-btn" data-model-id="gemini-2.5-pro">2.5 pro</button>
                         <button id="model-2-5-flash-preview-btn" data-model-id="gemini-2.5-flash">2.5 flash</button>
                         <button id="model-2-0-flash-btn" data-model-id="gemini-2.0-flash">2.0 flash</button>
-                        <button id="model-gemma-3-27b-it-btn" data-model-id="gemma-3-27b-it">Gemma 3 27B</button> </div>
+                        <button id="model-gemma-3-27b-it-btn" data-model-id="gemma-3-27b-it">Gemma 3 27B</button>
+                    </div>
                 </div>
             </div>
 
@@ -930,11 +923,9 @@
     </div>
 
     <script>
-        // Global variables for the API key (remains empty, Canvas will provide it)
         const geminiApiKey = "AIzaSyCNUwQzg6cyfZJdiCvF5m34tcdjaO9XNWo";
         const stabilityApiKey = "sk-jvi1Fy9CqZeH7lp7qWy2o1uvuXYXs75mtAllTkXM0TmAo30F";
 
-        // Get references to DOM elements
         const appContainer = document.querySelector('.app-container');
         const chatTab = document.getElementById('chat-tab');
         const imageTab = document.getElementById('image-tab');
@@ -948,7 +939,6 @@
         const chatLoadingText = document.getElementById('chat-loading-text');
         const clearChatBtn = document.getElementById('clear-chat-btn');
 
-        // Elements for image/file upload in chat
         const choosePhotoBtn = document.getElementById('choose-photo-btn');
         const takePhotoBtn = document.getElementById('take-photo-btn');
         const uploadFileBtn = document.getElementById('upload-file-btn');
@@ -962,97 +952,85 @@
         const filePreviewFilename = document.getElementById('file-preview-filename');
         const removeFileBtn = document.getElementById('remove-file-btn');
 
-        // Global message banners
         const globalErrorBanner = document.getElementById('global-error-banner');
         const globalSuccessBanner = document.getElementById('global-success-banner');
 
-        // Image generation elements
         const imagePromptInput = document.getElementById('image-prompt-input');
-        const clearImagePromptBtn = document.getElementById('clear-image-prompt-btn'); // New: Clear button for image prompt
-        const stabilityEngineSelect = document.getElementById('stabilityEngineSelect'); // New select for Stability AI engines
-        const stabilityEngineLabel = document.getElementById('stability-engine-label'); // New label for Stability AI engine select
+        const clearImagePromptBtn = document.getElementById('clear-image-prompt-btn');
+        const stabilityEngineSelect = document.getElementById('stabilityEngineSelect');
+        const stabilityEngineLabel = document.getElementById('stability-engine-label');
         const generateImageBtn = document.getElementById('generate-image-btn');
         const generatedImage = document.getElementById('generated-image');
         const downloadImageBtn = document.getElementById('download-image-btn');
         const imageLoading = document.getElementById('image-loading');
 
-        // Settings Modal elements
         const settingsBtn = document.getElementById('settings-btn');
         const settingsModalOverlay = document.getElementById('settings-modal-overlay');
         const settingsModalCloseBtn = document.getElementById('settings-modal-close-btn');
         const themeSettingsTab = document.getElementById('theme-settings-tab');
         const languageSettingsTab = document.getElementById('language-settings-tab');
-        const modelSettingsTab = document.getElementById('model-settings-tab'); // New reference for model tab
+        const modelSettingsTab = document.getElementById('model-settings-tab');
         const developersSettingsTab = document.getElementById('developers-settings-tab');
         const themeSettingsContent = document.getElementById('theme-settings-content');
         const languageSettingsContent = document.getElementById('language-settings-content');
-        const modelSettingsContent = document.getElementById('model-settings-content'); // New reference for model content
+        const modelSettingsContent = document.getElementById('model-settings-content');
         const developersSettingsContent = document.getElementById('developers-settings-content');
         const themeLightBtn = document.getElementById('theme-light-btn');
         const themeDarkBtn = document.getElementById('theme-dark-btn');
         const themeSystemBtn = document.getElementById('theme-system-btn');
         const langRuBtn = document.getElementById('lang-ru-btn');
         const langEnBtn = document.getElementById('lang-en-btn');
-
-        // New model selection buttons
+        
+        const model25ProBtn = document.getElementById('model-2-5-pro-btn');
         const model25FlashPreviewBtn = document.getElementById('model-2-5-flash-preview-btn');
         const model20FlashBtn = document.getElementById('model-2-0-flash-btn');
-        const modelGemma327BItBtn = document.getElementById('model-gemma-3-27b-it-btn'); // Updated reference for Gemma model button
+        const modelGemma327BItBtn = document.getElementById('model-gemma-3-27b-it-btn');
 
-        // Localized elements
         const headerSubtitle = document.getElementById('header-subtitle');
-        const aiPrefixSpan = document.getElementById('ai-prefix'); // New: for AI prefix
+        const aiPrefixSpan = document.getElementById('ai-prefix');
         const aiGreeting = document.getElementById('ai-greeting');
-        const chatInputPlaceholder = chatInput; // Direct reference to textarea
-        const sendBtnTitle = smallSendBtn; // Direct reference to button for title attribute
+        const chatInputPlaceholder = chatInput;
+        const sendBtnTitle = smallSendBtn;
         const galleryBtnText = document.getElementById('gallery-btn-text');
         const cameraBtnText = document.getElementById('camera-btn-text');
         const fileBtnText = document.getElementById('file-btn-text');
         const imagePromptLabel = document.getElementById('image-prompt-label');
-        // imagePromptInputPlaceholder points to the actual input element to set its placeholder
         const imagePromptInputPlaceholder = imagePromptInput;
         const generatedImageText = document.getElementById('generated-image-text');
         const settingsTitle = document.getElementById('settings-title');
         const themeLabel = document.getElementById('theme-label');
         const languageLabel = document.getElementById('language-label');
-        const modelLabel = document.getElementById('model-label'); // New reference for model label
+        const modelLabel = document.getElementById('model-label');
         const developersHeader = document.getElementById('developers-header');
         const generatingText = document.getElementById('generating-text');
-        const devsTeamMembersLabel = document.getElementById('devs-team-members-label'); // New: for developers info
-        const devsContactInfoParagraph = document.getElementById('devs-contact-info-paragraph'); // New: for developers contact info paragraph
-        const devsContactLink = document.getElementById('devs-contact-link'); // New: for developers contact link
-        const devsSupporters = document.getElementById('devs-supporters'); // New: for supporters info
+        const devsTeamMembersLabel = document.getElementById('devs-team-members-label');
+        const devsContactInfoParagraph = document.getElementById('devs-contact-info-paragraph');
+        const devsContactLink = document.getElementById('devs-contact-link');
+        const devsSupporters = document.getElementById('devs-supporters');
 
-
-        // Variables to store attached file data
         let attachedImageData = null;
         let attachedImageMimeType = null;
         let attachedFileData = null;
         let attachedFileMimeType = null;
         let attachedFileName = null;
 
-        // Chat history to maintain context
         let chatHistory = [{ role: "model", parts: [{ text: "Привет, я Poison AI, разработка Poison Team. Чем могу помочь?" }] }];
 
-        // Initial height for chat input textarea
-        const initialChatInputHeight = 48; // Corresponds to 3rem (1rem = 16px, so 3*16 = 48px)
-        const expandedChatInputHeight = initialChatInputHeight * 2; // 96px
+        const initialChatInputHeight = 48;
+        const expandedChatInputHeight = initialChatInputHeight * 2;
 
-        // Theme, Language, and Model state
-        let currentTheme = localStorage.getItem('theme') || 'system'; // 'light', 'dark', 'system'
-        let currentLanguage = localStorage.getItem('language') || 'ru'; // 'ru', 'en'
-        // Updated default model to 'gemini-2.5-flash'
+        let currentTheme = localStorage.getItem('theme') || 'system';
+        let currentLanguage = localStorage.getItem('language') || 'ru';
         let currentModel = localStorage.getItem('model') || 'gemini-2.5-flash';
 
-        // Language data for localization
         const languageData = {
             'ru': {
                 'chatTab': 'Чат с Poison AI',
                 'imageTab': 'Генерация изображений',
                 'headerSubtitle': 'Введите текст для общения с искусственным интеллектом или опишите изображение для генерации.',
                 'clearChatBtnTitle': 'Чат очищен!',
-                'aiPrefix': 'Poison AI:', // New: AI prefix
-                'userPrefix': 'Вы:', // New: User prefix
+                'aiPrefix': 'Poison AI:',
+                'userPrefix': 'Вы:',
                 'aiGreeting': 'Привет, я Poison AI, разработка Poison Team. Чем могу помочь?',
                 'chatInputPlaceholder': 'Введите ваше сообщение...',
                 'sendBtnTitle': 'Отправить сообщение',
@@ -1061,8 +1039,8 @@
                 'fileBtn': 'Файл',
                 'loadingText': 'Загрузка...',
                 'imagePromptLabel': 'Описание изображения:',
-                'imagePromptPlaceholderText': 'Введите описание...', // Placeholder text
-                'imagePromptErrorText': 'Пожалуйста, введите описание для генерации.', // Error message text
+                'imagePromptPlaceholderText': 'Введите описание...',
+                'imagePromptErrorText': 'Пожалуйста, введите описание для генерации.',
                 'generateImageBtn': 'Сгенерировать изображение',
                 'generatedImagePlaceholder': 'Ваше изображение появится здесь',
                 'generatedImageText': 'Ваше сгенерированное изображение:',
@@ -1073,18 +1051,18 @@
                 'settingsTitle': 'Настройки',
                 'settingsThemeTab': 'Тема',
                 'settingsLanguageTab': 'Язык',
-                'settingsModelTab': 'Модель', // New: Model tab title
+                'settingsModelTab': 'Модель',
                 'settingsDevelopersTab': 'Разработчики',
                 'themeLight': 'Светлая',
                 'themeDark': 'Темная',
                 'themeSystem': 'Как в системе',
                 'languageRussian': 'Русский',
                 'languageEnglish': 'Английский',
-                'modelLabel': 'Выберите модель:', // New: Model label
-                'developersTeamMembers': 'Участники команды Poison Team:', // New: Developers info
-                'developersContactInfo': 'Подробности можно узнать у ', // Updated contact info string
-                'developersContactLinkText': '@By_PoisonAI', // Updated link text
-                'developersSupporters': 'Поддерживали: otchim_ksb', // New supporters string
+                'modelLabel': 'Выберите модель:',
+                'developersTeamMembers': 'Участники команды Poison Team:',
+                'developersContactInfo': 'Подробности можно узнать у ',
+                'developersContactLinkText': '@By_PoisonAI',
+                'developersSupporters': 'Поддерживали: otchim_ksb',
                 'fileAttached': 'Прикреплен файл:',
                 'apiError': 'API Ошибка:',
                 'genericError': 'Ошибка:',
@@ -1101,8 +1079,8 @@
                 'imageTab': 'Image Generation',
                 'headerSubtitle': 'Enter text to chat with AI or describe an image to generate.',
                 'clearChatBtnTitle': 'Chat cleared!',
-                'aiPrefix': 'Poison AI:', // New: AI prefix
-                'userPrefix': 'You:', // New: User prefix
+                'aiPrefix': 'Poison AI:',
+                'userPrefix': 'You:',
                 'aiGreeting': 'Hello, I am Poison AI, developed by Poison Team. How can I help you?',
                 'chatInputPlaceholder': 'Type your message...',
                 'sendBtnTitle': 'Send Message',
@@ -1111,8 +1089,8 @@
                 'fileBtn': 'File',
                 'loadingText': 'Loading...',
                 'imagePromptLabel': 'Image Description:',
-                'imagePromptPlaceholderText': 'Enter description...', // Placeholder text
-                'imagePromptErrorText': 'Please enter a description for generation.', // Error message text
+                'imagePromptPlaceholderText': 'Enter description...',
+                'imagePromptErrorText': 'Please enter a description for generation.',
                 'generateImageBtn': 'Generate Image',
                 'generatedImagePlaceholder': 'Your image will appear here',
                 'generatedImageText': 'Your generated image:',
@@ -1123,18 +1101,18 @@
                 'settingsTitle': 'Settings',
                 'settingsThemeTab': 'Theme',
                 'settingsLanguageTab': 'Language',
-                'settingsModelTab': 'Model', // New: Model tab title
+                'settingsModelTab': 'Model',
                 'settingsDevelopersTab': 'Developers',
                 'themeLight': 'Light',
                 'themeDark': 'Dark',
                 'themeSystem': 'System',
                 'languageRussian': 'Russian',
                 'languageEnglish': 'English',
-                'modelLabel': 'Select model:', // New: Model label
-                'developersTeamMembers': 'Poison Team Members:', // New: Developers info
-                'developersContactInfo': 'More info at ', // Updated contact info string
-                'developersContactLinkText': '@By_PoisonAI', // Updated link text
-                'developersSupporters': 'Supported by: otchim_ksb', // New supporters string
+                'modelLabel': 'Select model:',
+                'developersTeamMembers': 'Poison Team Members:',
+                'developersContactInfo': 'More info at ',
+                'developersContactLinkText': '@By_PoisonAI',
+                'developersSupporters': 'Supported by: otchim_ksb',
                 'fileAttached': 'Attached file:',
                 'apiError': 'API Error:',
                 'genericError': 'Error:',
@@ -1148,10 +1126,6 @@
             }
         };
 
-        /**
-         * Applies the selected theme to the body.
-         * @param {string} theme - 'light', 'dark', or 'system'.
-         */
         function applyTheme(theme) {
             currentTheme = theme;
             localStorage.setItem('theme', theme);
@@ -1161,20 +1135,16 @@
                 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     document.body.classList.add('dark-theme');
                 } else {
-                    // Default to light if system is not dark
                     document.body.classList.add('light-theme');
                 }
             } else if (theme === 'dark') {
                 document.body.classList.add('dark-theme');
-            } else { // 'light'
+            } else {
                 document.body.classList.add('light-theme');
             }
             updateThemeButtonsState();
         }
 
-        /**
-         * Updates the active state of theme selection buttons.
-         */
         function updateThemeButtonsState() {
             [themeLightBtn, themeDarkBtn, themeSystemBtn].forEach(btn => {
                 btn.classList.remove('active');
@@ -1184,10 +1154,6 @@
             else if (currentTheme === 'system') themeSystemBtn.classList.add('active');
         }
 
-        /**
-         * Applies the selected language to the UI.
-         * @param {string} lang - 'ru' or 'en'.
-         */
         function applyLanguage(lang) {
             currentLanguage = lang;
             localStorage.setItem('language', lang);
@@ -1195,9 +1161,6 @@
             updateLanguageButtonsState();
         }
 
-        /**
-         * Updates the active state of language selection buttons.
-         */
         function updateLanguageButtonsState() {
             [langRuBtn, langEnBtn].forEach(btn => {
                 btn.classList.remove('active');
@@ -1206,41 +1169,30 @@
             else if (currentLanguage === 'en') langEnBtn.classList.add('active');
         }
 
-        /**
-         * Sets the current Gemini model for chat.
-         * @param {string} modelId - The ID of the Gemini model.
-         */
         function setChatModel(modelId) {
             currentModel = modelId;
             localStorage.setItem('model', modelId);
             updateModelButtonsState();
         }
 
-        /**
-         * Updates the active state of model selection buttons.
-         */
         function updateModelButtonsState() {
-            [model25FlashPreviewBtn, model20FlashBtn, modelGemma327BItBtn].forEach(btn => { // Updated button list
+            [model25ProBtn, model25FlashPreviewBtn, model20FlashBtn, modelGemma327BItBtn].forEach(btn => {
                 btn.classList.remove('active');
             });
-            // Updated condition for 2.5 flash preview to 05-20
-            if (currentModel === 'gemini-2.5-flash') model25FlashPreviewBtn.classList.add('active');
+            if (currentModel === 'gemini-2.5-pro') model25ProBtn.classList.add('active');
+            else if (currentModel === 'gemini-2.5-flash') model25FlashPreviewBtn.classList.add('active');
             else if (currentModel === 'gemini-2.0-flash') model20FlashBtn.classList.add('active');
-            else if (currentModel === 'gemma-3-27b-it') modelGemma327BItBtn.classList.add('active'); // Updated condition for Gemma
+            else if (currentModel === 'gemma-3-27b-it') modelGemma327BItBtn.classList.add('active');
         }
 
-        /**
-         * Updates all localizable UI elements based on the current language.
-         */
         function updateUILanguage() {
             const lang = currentLanguage;
             const data = languageData[lang];
 
-            // Main app elements
             chatTab.textContent = data.chatTab;
             imageTab.textContent = data.imageTab;
             headerSubtitle.textContent = data.headerSubtitle;
-            clearChatBtn.title = data.clearChatBtnTitle; // This updates the button's title attribute
+            clearChatBtn.title = data.clearChatBtnTitle;
             chatInputPlaceholder.placeholder = data.chatInputPlaceholder;
             smallSendBtn.title = data.sendBtnTitle;
             galleryBtnText.textContent = data.galleryBtn;
@@ -1248,8 +1200,8 @@
             fileBtnText.textContent = data.fileBtn;
             chatLoadingText.textContent = data.loadingText;
             imagePromptLabel.textContent = data.imagePromptLabel;
-            stabilityEngineLabel.textContent = data.languageRussian === 'Русский' ? 'Выберите модель (движок):' : 'Select model (engine):'; // Explicitly set for this label
-            imagePromptInputPlaceholder.placeholder = data.imagePromptPlaceholderText; // Set placeholder
+            stabilityEngineLabel.textContent = data.languageRussian === 'Русский' ? 'Выберите модель (движок):' : 'Select model (engine):';
+            imagePromptInputPlaceholder.placeholder = data.imagePromptPlaceholderText;
             generateImageBtn.textContent = data.generateImageBtn;
             generatedImage.alt = data.generatedImagePlaceholder;
             generatedImageText.textContent = data.generatedImageText;
@@ -1257,11 +1209,10 @@
             generatingText.textContent = data.generatingText;
             settingsBtn.title = data.settingsTitle;
 
-            // Settings modal elements
             settingsTitle.textContent = data.settingsTitle;
             themeSettingsTab.textContent = data.settingsThemeTab;
             languageSettingsTab.textContent = data.settingsLanguageTab;
-            modelSettingsTab.textContent = data.settingsModelTab; // Update model tab text
+            modelSettingsTab.textContent = data.settingsModelTab;
             developersSettingsTab.textContent = data.settingsDevelopersTab;
             themeLabel.textContent = data.themeLabel;
             themeLightBtn.textContent = data.themeLight;
@@ -1270,22 +1221,17 @@
             languageLabel.textContent = data.languageLabel;
             langRuBtn.textContent = data.languageRussian;
             langEnBtn.textContent = data.languageEnglish;
-            modelLabel.textContent = data.modelLabel; // Update model label text
+            modelLabel.textContent = data.modelLabel;
 
-            // Developers info
             devsTeamMembersLabel.textContent = data.developersTeamMembers;
-            // Update contact info and supporters as per image
             devsContactInfoParagraph.innerHTML = `${data.developersContactInfo}<a id="devs-contact-link" href="https://t.me/By_PoisonAI" target="_blank" class="text-blue-500 hover:underline">${data.developersContactLinkText}</a>`;
             devsSupporters.textContent = data.developersSupporters;
 
-
-            // Update the greeting message in chat history if it's the initial one
             const currentAiGreeting = document.querySelector('#chat-history .chat-message.ai #ai-greeting');
             if (currentAiGreeting) {
                 currentAiGreeting.textContent = data.aiGreeting;
             }
 
-            // Update prefixes in existing messages
             const currentAiPrefix = document.querySelector('#chat-history .chat-message.ai .prefix');
             if (currentAiPrefix) {
                 currentAiPrefix.textContent = data.aiPrefix;
@@ -1296,15 +1242,7 @@
             });
         }
 
-
-        /**
-         * Formats the raw text from the AI response to include bold, new lines, and code blocks.
-         * This version removes all syntax highlighting.
-         * @param {string} text - The raw text from the AI.
-         * @returns {string} - The HTML formatted text.
-         */
         function formatChatMessage(text) {
-            // Ensure text is a string before attempting to use string methods
             if (typeof text !== 'string') {
                 console.warn('formatChatMessage received non-string input:', text);
                 return String(text);
@@ -1312,61 +1250,32 @@
 
             let formattedText = text;
 
-            // --- CRITICAL IMPROVEMENT: Aggressively remove all HTML tags, attributes, and problematic characters ---
-            // This regex targets:
-            // 1. Any HTML tag: <...>
-            // 2. Any HTML attribute: class="...", data-something="..."
-            // 3. Specific problematic patterns like 'class=class="syntax-string">'
-            // 4. Stray '>' characters that might be left from malformed input
-            // 5. Any remaining 'syntax-' strings or 'class=' strings
-            // This regex is designed to be very broad to catch any unexpected HTML-like remnants.
             formattedText = formattedText.replace(/<[^>]*>|class\s*=\s*["'][^"']*["']|data-[^=]*\s*=\s*["'][^"']*["']|syntax-[a-zA-Z-]+|class=|>/g, '');
-            // A final pass to catch any lingering partial or malformed HTML entities or attributes
             formattedText = formattedText.replace(/&lt;.*?&gt;|\b(class|syntax|string|comment|function|number|keyword)\b/g, '');
 
-
-            // Process Markdown links [text](url) to direct clickable URLs
             formattedText = formattedText.replace(/\[.*?\]\((https?:\/\/[^\s]+)\)/g, '<a href="$1" target="_blank" class="text-blue-500 hover:underline">$1</a>');
 
-            // Process code blocks (```)
             formattedText = formattedText.replace(/```(.*?)```/gs, (match, codeContent) => {
-                // Store original code content for copying
                 let originalCodeContent = codeContent;
 
-                // Add a space after "Python" if it's the first word in the code block (case-insensitive)
                 if (originalCodeContent.toLowerCase().startsWith('python')) {
-                    // Check if there's no space immediately after "python"
                     if (!originalCodeContent.toLowerCase().startsWith('python ')) {
                         originalCodeContent = 'Python ' + originalCodeContent.substring('python'.length);
                     }
                 }
 
-                // Convert newlines within the code block for display
-                // This will now preserve newlines for display, but the `white-space: pre;` CSS will make it scroll horizontally
                 const displayCode = originalCodeContent; 
 
                 return `<pre class="code-block"><code data-original-code="${encodeURIComponent(originalCodeContent)}">${displayCode}</code></pre>`;
             });
 
-            // Process bold (**)
             formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-            // Process new line (*) - as per user's request (start new line before content)
             formattedText = formattedText.replace(/\*(.*?)\*/g, '<br>$1');
-
-            // Convert any remaining standard newlines to <br> tags (outside code blocks)
             formattedText = formattedText.replace(/\n/g, '<br>');
 
             return formattedText;
         }
 
-        /**
-         * Adds a message to the chat history.
-         * @param {string} text - The message text.
-         * @param {string} sender - The sender ('user' или 'ai').
-         * @param {string|null} imageUrl - URL изображения, если есть.
-         * @param {string|null} fileName - Имя прикрепленного файла, если есть.
-         */
         function addMessageToChat(text, sender, imageUrl = null, fileName = null) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('chat-message', sender);
@@ -1375,13 +1284,12 @@
             prefixSpan.classList.add('prefix');
 
             if (sender === 'ai') {
-                prefixSpan.textContent = languageData[currentLanguage].aiPrefix; // Use localized AI prefix
+                prefixSpan.textContent = languageData[currentLanguage].aiPrefix;
                 messageDiv.appendChild(prefixSpan);
                 const textContentContainer = document.createElement('span');
-                textContentContainer.innerHTML = " " + formatChatMessage(text); // Используем innerHTML для форматированного текста
+                textContentContainer.innerHTML = " " + formatChatMessage(text);
                 messageDiv.appendChild(textContentContainer);
 
-                // Add copy buttons to code blocks for AI messages
                 const codeBlocks = textContentContainer.querySelectorAll('.code-block');
                 codeBlocks.forEach(codeBlock => {
                     const copyButton = document.createElement('button');
@@ -1389,17 +1297,14 @@
                     copyButton.classList.add('copy-code-btn');
 
                     copyButton.addEventListener('click', () => {
-                        // Retrieve the original, unhighlighted code content from the data attribute
                         const codeContent = decodeURIComponent(codeBlock.querySelector('code').dataset.originalCode);
                         
-                        // Use document.execCommand('copy') for better iframe compatibility
                         const textarea = document.createElement('textarea');
                         textarea.value = codeContent;
-                        // Ensure textarea preserves all whitespace for accurate copying
                         textarea.style.whiteSpace = 'pre';
                         textarea.style.overflow = 'hidden';
                         textarea.style.position = 'absolute';
-                        textarea.style.left = '-9999px'; // Move off-screen
+                        textarea.style.left = '-9999px';
                         document.body.appendChild(textarea);
                         textarea.select();
                         try {
@@ -1410,7 +1315,7 @@
                                     copyButton.textContent = languageData[currentLanguage].copyBtn;
                                 }, 2000);
                             } else {
-                                showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error'); // Reusing fileReadError for generic copy error
+                                showMessageBanner(globalErrorBanner, languageData[currentLanguage].fileReadError, 'error');
                             }
                         } catch (err) {
                             console.error('Ошибка при копировании:', err);
@@ -1422,8 +1327,8 @@
                     codeBlock.appendChild(copyButton);
                 });
 
-            } else { // User message
-                prefixSpan.textContent = languageData[currentLanguage].userPrefix; // Use localized User prefix
+            } else {
+                prefixSpan.textContent = languageData[currentLanguage].userPrefix;
                 messageDiv.appendChild(prefixSpan);
                 const textNode = document.createElement('span');
                 textNode.textContent = " " + text;
@@ -1435,7 +1340,7 @@
                     imgElement.classList.add('mt-2', 'rounded-md', 'max-w-full', 'h-auto', 'max-h-40', 'object-contain');
                     messageDiv.appendChild(imgElement);
                 }
-                if (fileName && !imageUrl) { // Only show file name if it's not an image (images have their own preview)
+                if (fileName && !imageUrl) {
                     const fileSpan = document.createElement('span');
                     fileSpan.classList.add('block', 'text-xs', 'text-gray-500', 'mt-1');
                     fileSpan.textContent = `${languageData[currentLanguage].fileAttached} ${fileName}`;
@@ -1447,14 +1352,7 @@
             chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
         }
 
-        /**
-         * Shows a global message banner with a smooth transition.
-         * @param {HTMLElement} element - The DOM element to show the message in (globalErrorBanner or globalSuccessBanner).
-         * @param {string} message - The message text.
-         * @param {string} type - 'error' or 'success'.
-         */
         function showMessageBanner(element, message, type) {
-            // Скрыть другой баннер, если он активен
             if (type === 'error') {
                 hideMessageBanner(globalSuccessBanner);
             } else {
@@ -1462,25 +1360,17 @@
             }
 
             element.textContent = message;
-            // Убедимся, что классы типа всегда устанавливаются корректно
-            element.classList.remove('error', 'success'); // Сначала удаляем, потом добавляем
+            element.classList.remove('error', 'success');
             element.classList.add(type, 'show');
 
-            // Set a timeout to hide the banner after 3 seconds
             setTimeout(() => {
                 hideMessageBanner(element);
-            }, 3000); // 3 секунды
+            }, 3000);
         }
 
-        /**
-         * Hides a global message banner with a smooth transition.
-         * @param {HTMLElement} element - The DOM element to hide the message in.
-         */
         function hideMessageBanner(element) {
             element.classList.remove('show');
-            // Remove type classes after the transition completes
             element.addEventListener('transitionend', function handler() {
-                // Check if the banner is actually hidden (opacity is 0) before removing type classes
                 if (window.getComputedStyle(element).opacity === '0') {
                     element.classList.remove('error', 'success');
                 }
@@ -1488,22 +1378,15 @@
             }, { once: true });
         }
 
-        /**
-         * Switches between chat and image generation views.
-         * @param {string} viewId - The ID of the view to activate ('chat-view', 'image-view').
-         */
         function switchView(viewId) {
-            // Deactivate all tabs and content views
             document.querySelectorAll('.nav-tabs button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
 
-            // Hide any active error/success messages when switching views
             hideMessageBanner(globalErrorBanner);
             hideMessageBanner(globalSuccessBanner);
 
-            // Activate the selected tab and content view
             if (viewId === 'chat-view') {
                 chatTab.classList.add('active');
                 chatView.classList.add('active');
@@ -1513,16 +1396,12 @@
             }
         }
 
-        /**
-         * Clears the chat history.
-         */
         function clearChat() {
             chatHistoryDiv.innerHTML = `
                 <div class="chat-message ai">
                     <span class="prefix" id="ai-prefix-cleared">${languageData[currentLanguage].aiPrefix}</span> <span id="ai-greeting-cleared">${languageData[currentLanguage].aiGreeting}</span>
                 </div>
             `;
-            // Ensure the ai-greeting span is updated if it was just cleared
             const aiGreetingCleared = document.getElementById('ai-greeting-cleared');
             if (aiGreetingCleared) {
                 aiGreetingCleared.textContent = languageData[currentLanguage].aiGreeting;
@@ -1535,13 +1414,9 @@
 
             chatHistory = [{ role: "model", parts: [{ text: languageData[currentLanguage].aiGreeting }] }];
             chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-            // Now, use the updated clearChatBtnTitle for the success message
             showMessageBanner(globalSuccessBanner, languageData[currentLanguage].clearChatBtnTitle, 'success');
         }
 
-        /**
-         * Clears all attached file previews and data.
-         */
         function clearAttachments() {
             attachedImageData = null;
             attachedImageMimeType = null;
@@ -1550,20 +1425,17 @@
             attachedFileName = null;
 
             filePreviewImage.src = '';
-            filePreviewImage.classList.add('hidden'); // Hide image preview
-            filePreviewIcon.classList.add('hidden'); // Hide file icon
+            filePreviewImage.classList.add('hidden');
+            filePreviewIcon.classList.add('hidden');
             filePreviewFilename.textContent = '';
-            fileUploadPreview.classList.add('hidden'); // Hide the whole preview container
-            fileUploadPreview.classList.remove('flex'); // Ensure display:flex is removed
+            fileUploadPreview.classList.add('hidden');
+            fileUploadPreview.classList.remove('flex');
 
-            fileInput.value = ''; // Reset chosen file from gallery
-            cameraInput.value = ''; // Reset captured photo
-            generalFileInput.value = ''; // Reset general file input
+            fileInput.value = '';
+            cameraInput.value = '';
+            generalFileInput.value = '';
         }
 
-        /**
-         * Handles sending a message to the AI.
-         */
         async function sendMessage() {
             hideMessageBanner(globalErrorBanner);
             const prompt = chatInput.value.trim();
@@ -1573,47 +1445,41 @@
                 return;
             }
 
-            // Add user message to UI chat history
             addMessageToChat(prompt, 'user', attachedImageData ? attachedImageData : null, attachedFileName);
-            chatInput.value = ''; // Clear text input field
-            resetChatInputHeight(); // Reset height after sending
+            chatInput.value = '';
+            resetChatInputHeight();
 
-            chatLoading.classList.remove('hidden'); // Show loading spinner
-            chatLoadingText.textContent = languageData[currentLanguage].loadingText; // Set loading text
+            chatLoading.classList.remove('hidden');
+            chatLoadingText.textContent = languageData[currentLanguage].loadingText;
             smallSendBtn.disabled = true;
             choosePhotoBtn.disabled = true;
             takePhotoBtn.disabled = true;
             uploadFileBtn.disabled = true;
-            document.body.style.cursor = 'wait'; // Show wait cursor
+            document.body.style.cursor = 'wait';
 
 
             try {
                 const payloadContents = [];
 
-                // Iterate through existing chatHistory to build payload for API
                 for (const entry of chatHistory) {
                     const partsForApi = [];
                     for (const part of entry.parts) {
                         if (part.text) {
                             let textContent = part.text;
-                            // Remove "Poison AI:" prefix for previous model messages when sending to API
                             if (entry.role === 'model' && (textContent.startsWith(languageData['ru'].aiPrefix) || textContent.startsWith(languageData['en'].aiPrefix))) {
                                 textContent = textContent.substring(textContent.indexOf(':') + 1).trim();
                             }
-                            // Remove "Вы:" prefix for previous user messages when sending to API
                             if (entry.role === 'user' && (textContent.startsWith(languageData['ru'].userPrefix) || textContent.startsWith(languageData['en'].userPrefix))) {
                                 textContent = textContent.substring(textContent.indexOf(':') + 1).trim();
                             }
                             partsForApi.push({ text: textContent });
                         } else if (part.inlineData) {
-                            // Include image data as is for previous turns
                             partsForApi.push(part);
                         }
                     }
                     payloadContents.push({ role: entry.role, parts: partsForApi });
                 }
 
-                // Add current user prompt and attached data (if any) to payload
                 const currentUserParts = [];
                 if (prompt) {
                     currentUserParts.push({ text: prompt });
@@ -1622,7 +1488,7 @@
                     currentUserParts.push({
                         inlineData: {
                             mimeType: attachedImageMimeType,
-                            data: attachedImageData.split(',')[1] // Get base64 data without prefix
+                            data: attachedImageData.split(',')[1]
                         }
                     });
                 } else if (attachedFileData && attachedFileMimeType) {
@@ -1630,11 +1496,10 @@
                         text: `${languageData[currentLanguage].fileAttached} "${attachedFileName}":\n\`\`\`\n${attachedFileData}\n\`\`\``
                     });
                 }
-                payloadContents.push({ role: "user", parts: currentUserParts }); // Add current user turn
+                payloadContents.push({ role: "user", parts: currentUserParts });
 
                 const payload = { contents: payloadContents };
 
-                // Use the currentModel for the API call
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${geminiApiKey}`;
 
                 const response = await fetch(apiUrl, {
@@ -1650,8 +1515,7 @@
 
                 const result = await response.json();
 
-                // Check if result.candidates[0].content.parts[0].text exists and is a string
-                let aiText = languageData[currentLanguage].aiResponseError; // Default error message
+                let aiText = languageData[currentLanguage].aiResponseError;
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0 &&
@@ -1663,7 +1527,6 @@
                 }
                 
                 addMessageToChat(aiText, 'ai');
-                // Save original user prompt and attached data to chatHistory for future context
                 const userHistoryParts = [{ text: prompt }];
                 if (attachedImageData && attachedImageMimeType) {
                     userHistoryParts.push({ inlineData: { mimeType: attachedImageMimeType, data: attachedImageData.split(',')[1] } });
@@ -1677,42 +1540,37 @@
                 console.error("Ошибка при отправке сообщения:", error);
                 showMessageBanner(globalErrorBanner, `${languageData[currentLanguage].genericError} ${error.message}. ${languageData[currentLanguage].aiResponseError}`, 'error');
             } finally {
-                chatLoading.classList.add('hidden'); // Hide loading spinner
+                chatLoading.classList.add('hidden');
                 smallSendBtn.disabled = false;
                 choosePhotoBtn.disabled = false;
                 takePhotoBtn.disabled = false;
                 uploadFileBtn.disabled = false;
-                document.body.style.cursor = 'default'; // Restore default cursor
-                clearAttachments(); // Clear all attachments after sending
+                document.body.style.cursor = 'default';
+                clearAttachments();
             }
         }
 
-        /**
-         * Handles generating an image using Stability AI.
-         */
         async function generateImage() {
-            // Ensure we are on the image generation tab
             switchView('image-view');
 
             hideMessageBanner(globalErrorBanner);
             hideMessageBanner(globalSuccessBanner);
-            downloadImageBtn.classList.add('hidden'); // Hide download button
+            downloadImageBtn.classList.add('hidden');
 
             const prompt = imagePromptInput.value.trim();
-            const engineId = stabilityEngineSelect.value; // Get selected engine ID
+            const engineId = stabilityEngineSelect.value;
 
             if (!prompt) {
                 showMessageBanner(globalErrorBanner, languageData[currentLanguage].imagePromptErrorText, 'error');
                 return;
             }
 
-            // Set placeholder image and alt text for loading state
             generatedImage.src = `https://placehold.co/400x300/e2e8f0/6b7280?text=${encodeURIComponent(languageData[currentLanguage].generatingText)}`;
             generatedImage.alt = languageData[currentLanguage].generatingText;
 
             imageLoading.classList.remove('hidden');
             generateImageBtn.disabled = true;
-            document.body.style.cursor = 'wait'; // Show wait cursor
+            document.body.style.cursor = 'wait';
 
 
             try {
@@ -1726,16 +1584,15 @@
                         },
                     ],
                     cfg_scale: 7,
-                    height: 1024, // Default for SDXL
-                    width: 1024,  // Default for SDXL
+                    height: 1024,
+                    width: 1024,
                     samples: 1,
                     steps: 30,
                     seed: 0,
-                    style_preset: "photographic", // Can be changed or removed
+                    style_preset: "photographic",
                 };
 
-                // Adjust dimensions for older Stable Diffusion models
-                if (engineId === "stable-diffusion-v1-6") { // Removed stable-diffusion-v1-5
+                if (engineId === "stable-diffusion-v1-6") {
                     payload.height = 512;
                     payload.width = 512;
                 }
@@ -1745,7 +1602,7 @@
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        "Authorization": `Bearer ${stabilityApiKey}`, // Use Stability AI API key here
+                        "Authorization": `Bearer ${stabilityApiKey}`,
                     },
                     body: JSON.stringify(payload),
                 });
@@ -1767,9 +1624,8 @@
                     const base64Image = data.artifacts[0].base64;
                     generatedImage.src = `data:image/png;base64,${base64Image}`;
                     generatedImage.alt = languageData[currentLanguage].generatedImageText;
-                    downloadImageBtn.classList.remove('hidden'); // Show download button
+                    downloadImageBtn.classList.remove('hidden');
                     showMessageBanner(globalSuccessBanner, languageData[currentLanguage].generateImageBtn, 'success');
-                    // imagePromptInput.value = ''; // Do NOT clear input after successful generation
                 } else {
                     throw new Error(languageData[currentLanguage].imageGenError);
                 }
@@ -1781,15 +1637,11 @@
             } finally {
                 imageLoading.classList.add('hidden');
                 generateImageBtn.disabled = false;
-                document.body.style.cursor = 'default'; // Restore default cursor
-                // Ensure we stay on the image generation tab
+                document.body.style.cursor = 'default';
                 switchView('image-view');
             }
         }
 
-        /**
-         * Downloads the generated image.
-         */
         function downloadImage() {
             const imageUrl = generatedImage.src;
             if (imageUrl && !imageUrl.includes("placehold.co")) {
@@ -1804,62 +1656,44 @@
             }
         }
 
-        /**
-         * Adjusts the height of the chat input textarea based on content.
-         */
         function adjustChatInputHeight() {
-            chatInput.style.height = 'auto'; // Reset height to recalculate scrollHeight
-            // Set height to scrollHeight, but cap at expandedChatInputHeight
+            chatInput.style.height = 'auto';
             if (chatInput.scrollHeight > expandedChatInputHeight) {
                 chatInput.style.height = expandedChatInputHeight + 'px';
-                chatInput.style.overflowY = 'auto'; // Enable scroll if content exceeds double height
+                chatInput.style.overflowY = 'auto';
             } else {
                 chatInput.style.height = chatInput.scrollHeight + 'px';
                 chatInput.style.overflowY = 'hidden';
             }
         }
 
-        /**
-         * Resets the chat input textarea height to its initial size.
-         */
         function resetChatInputHeight() {
             chatInput.style.height = initialChatInputHeight + 'px';
             chatInput.style.overflowY = 'hidden';
         }
 
-        /**
-         * Opens the settings modal.
-         */
         function openSettingsModal() {
             settingsModalOverlay.classList.add('show');
-            // Ensure the correct tab is active when opening
+            document.body.classList.add('modal-open');
             switchSettingsTab('theme-settings-content');
         }
 
-        /**
-         * Closes the settings modal.
-         */
         function closeSettingsModal() {
             settingsModalOverlay.classList.remove('show');
+            document.body.classList.remove('modal-open');
         }
 
-        /**
-         * Switches between settings tabs.
-         * @param {string} tabContentId - The ID of the tab content to activate.
-         */
         function switchSettingsTab(tabContentId) {
-            // Deactivate all settings tabs and content
             document.querySelectorAll('.settings-tabs button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.settings-tab-content').forEach(content => content.classList.remove('active'));
 
-            // Activate the selected tab and content
             if (tabContentId === 'theme-settings-content') {
                 themeSettingsTab.classList.add('active');
                 themeSettingsContent.classList.add('active');
             } else if (tabContentId === 'language-settings-content') {
                 languageSettingsTab.classList.add('active');
                 languageSettingsContent.classList.add('active');
-            } else if (tabContentId === 'model-settings-content') { // New case for model settings
+            } else if (tabContentId === 'model-settings-content') {
                 modelSettingsTab.classList.add('active');
                 modelSettingsContent.classList.add('active');
             } else if (tabContentId === 'developers-settings-content') {
@@ -1868,26 +1702,21 @@
             }
         }
 
-
-        // Event listeners
         chatTab.addEventListener('click', () => switchView('chat-view'));
         imageTab.addEventListener('click', () => switchView('image-view'));
-        smallSendBtn.addEventListener('click', sendMessage); // Normal send
+        smallSendBtn.addEventListener('click', sendMessage);
 
         generateImageBtn.addEventListener('click', generateImage);
         downloadImageBtn.addEventListener('click', downloadImage);
         clearChatBtn.addEventListener('click', clearChat);
 
-        // Event listeners for file attachments
         choosePhotoBtn.addEventListener('click', () => fileInput.click());
         takePhotoBtn.addEventListener('click', () => cameraInput.click());
         uploadFileBtn.addEventListener('click', () => generalFileInput.click());
         removeFileBtn.addEventListener('click', clearAttachments);
 
-        // Textarea input event for dynamic resizing
         chatInput.addEventListener('input', adjustChatInputHeight);
 
-        // New: Event listener for image prompt input to show/hide clear button
         imagePromptInput.addEventListener('input', () => {
             if (imagePromptInput.value.trim() !== '') {
                 clearImagePromptBtn.style.display = 'block';
@@ -1896,25 +1725,22 @@
             }
         });
 
-        // New: Event listener for clear image prompt button
         clearImagePromptBtn.addEventListener('click', () => {
             imagePromptInput.value = '';
             clearImagePromptBtn.style.display = 'none';
         });
 
-
-        // Settings Modal Event Listeners
         settingsBtn.addEventListener('click', openSettingsModal);
         settingsModalCloseBtn.addEventListener('click', closeSettingsModal);
         settingsModalOverlay.addEventListener('click', (e) => {
-            if (e.target === settingsModalOverlay) { // Close only if clicking on overlay, not content
+            if (e.target === settingsModalOverlay) {
                 closeSettingsModal();
             }
         });
 
         themeSettingsTab.addEventListener('click', () => switchSettingsTab('theme-settings-content'));
         languageSettingsTab.addEventListener('click', () => switchSettingsTab('language-settings-content'));
-        modelSettingsTab.addEventListener('click', () => switchSettingsTab('model-settings-content')); // Event listener for new model tab
+        modelSettingsTab.addEventListener('click', () => switchSettingsTab('model-settings-content'));
         developersSettingsTab.addEventListener('click', () => switchSettingsTab('developers-settings-content'));
 
         themeLightBtn.addEventListener('click', () => applyTheme('light'));
@@ -1924,14 +1750,11 @@
         langRuBtn.addEventListener('click', () => applyLanguage('ru'));
         langEnBtn.addEventListener('click', () => applyLanguage('en'));
 
-        // Event listeners for model selection buttons
-        // Updated model ID for gemini-2.5-flash-preview-btn
+        model25ProBtn.addEventListener('click', () => setChatModel('gemini-2.5-pro'));
         model25FlashPreviewBtn.addEventListener('click', () => setChatModel('gemini-2.5-flash'));
         model20FlashBtn.addEventListener('click', () => setChatModel('gemini-2.0-flash'));
-        modelGemma327BItBtn.addEventListener('click', () => setChatModel('gemma-3-27b-it')); // Updated event listener for Gemma
+        modelGemma327BItBtn.addEventListener('click', () => setChatModel('gemma-3-27b-it'));
 
-
-        // Handler for choosing image file from gallery
         fileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -1942,15 +1765,15 @@
                 }
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    attachedImageData = e.target.result; // Base64 string
+                    attachedImageData = e.target.result;
                     attachedImageMimeType = file.type;
-                    attachedFileData = null; // Clear any text file data
+                    attachedFileData = null;
                     attachedFileMimeType = null;
                     attachedFileName = file.name;
 
                     filePreviewImage.src = attachedImageData;
                     filePreviewImage.classList.remove('hidden');
-                    filePreviewIcon.classList.add('hidden'); // Hide file icon
+                    filePreviewIcon.classList.add('hidden');
                     filePreviewFilename.textContent = file.name;
                     fileUploadPreview.classList.remove('hidden');
                     fileUploadPreview.classList.add('flex');
@@ -1965,7 +1788,6 @@
             }
         });
 
-        // Handler for capturing photo from camera
         cameraInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -1976,15 +1798,15 @@
                 }
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    attachedImageData = e.target.result; // Base64 string
+                    attachedImageData = e.target.result;
                     attachedImageMimeType = file.type;
-                    attachedFileData = null; // Clear any text file data
+                    attachedFileData = null;
                     attachedFileMimeType = null;
                     attachedFileName = file.name;
 
                     filePreviewImage.src = attachedImageData;
                     filePreviewImage.classList.remove('hidden');
-                    filePreviewIcon.classList.add('hidden'); // Hide file icon
+                    filePreviewIcon.classList.add('hidden');
                     filePreviewFilename.textContent = file.name;
                     fileUploadPreview.classList.remove('hidden');
                     fileUploadPreview.classList.add('flex');
@@ -1999,24 +1821,21 @@
             }
         });
 
-        // Handler for general file upload
         generalFileInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
-                // Check if it's an image
                 if (file.type.startsWith('image/')) {
-                    // If it's an image, use the image handling logic
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         attachedImageData = e.target.result;
                         attachedImageMimeType = file.type;
-                        attachedFileData = null; // Clear any text file data
+                        attachedFileData = null;
                         attachedFileMimeType = null;
                         attachedFileName = file.name;
 
                         filePreviewImage.src = attachedImageData;
                         filePreviewImage.classList.remove('hidden');
-                        filePreviewIcon.classList.add('hidden'); // Hide file icon
+                        filePreviewIcon.classList.add('hidden');
                         filePreviewFilename.textContent = file.name;
                         fileUploadPreview.classList.remove('hidden');
                         fileUploadPreview.classList.add('flex');
@@ -2027,17 +1846,16 @@
                     };
                     reader.readAsDataURL(file);
                 } else if (file.type.startsWith('text/') || file.type === 'application/json' || file.type === 'application/xml' || file.name.endsWith('.md') || file.name.endsWith('.csv') || file.name.endsWith('.html')) {
-                    // Handle text-based files
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        attachedFileData = e.target.result; // Raw text content
+                        attachedFileData = e.target.result;
                         attachedFileMimeType = file.type;
                         attachedFileName = file.name;
-                        attachedImageData = null; // Clear any image data
+                        attachedImageData = null;
                         attachedImageMimeType = null;
 
-                        filePreviewImage.classList.add('hidden'); // Hide image preview
-                        filePreviewIcon.classList.add('hidden'); // Hide file icon (was showing extension)
+                        filePreviewImage.classList.add('hidden');
+                        filePreviewIcon.classList.add('hidden');
                         filePreviewFilename.textContent = file.name;
                         fileUploadPreview.classList.remove('hidden');
                         fileUploadPreview.classList.add('flex');
@@ -2048,7 +1866,6 @@
                     };
                     reader.readAsText(file);
                 } else {
-                    // Unsupported file type
                     showMessageBanner(globalErrorBanner, languageData[currentLanguage].unsupportedFileError, 'error');
                     clearAttachments();
                 }
@@ -2057,37 +1874,30 @@
             }
         });
 
-
-        // Initialize view on load
         window.onload = () => {
-            // Apply theme and language from localStorage or system preference
             applyTheme(currentTheme);
             applyLanguage(currentLanguage);
-            setChatModel(currentModel); // Set initial model
+            setChatModel(currentModel);
             
-            // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
                 if (currentTheme === 'system') {
-                    applyTheme('system'); // Re-apply system theme
+                    applyTheme('system');
                 }
             });
 
-            switchView('chat-view'); // Default to chat view
+            switchView('chat-view');
             chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-            document.body.classList.add('loaded'); // Add class for app-container animation
-            resetChatInputHeight(); // Set initial height for textarea
-            // Initialize clear button state for image prompt
+            document.body.classList.add('loaded');
+            resetChatInputHeight();
             if (imagePromptInput.value.trim() !== '') {
                 clearImagePromptBtn.style.display = 'block';
             } else {
                 clearImagePromptBtn.style.display = 'none';
             }
 
-            // Ensure loading indicators are hidden on load
             chatLoading.classList.add('hidden');
             imageLoading.classList.add('hidden');
         };
     </script>
 </body>
 </html>
-
